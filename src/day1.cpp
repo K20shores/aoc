@@ -37,7 +37,7 @@ int part2(std::string line, const Trie &t)
     for (size_t i = 0; i < line.size(); ++i)
     {
         char c = line[i];
-        if ((c >= '0') && (c <= '9'))
+        if (std::isdigit(c))
         {
             left = (c - '0') * 10;
             break;
@@ -55,7 +55,7 @@ int part2(std::string line, const Trie &t)
     for (size_t i = line.size()-1; i >= 0; --i)
     {
         char c = line[i];
-        if ((c >= '0') && (c <= '9'))
+        if (std::isdigit(c))
         {
             right = c - '0';
             break;
