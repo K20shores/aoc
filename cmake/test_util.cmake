@@ -11,7 +11,7 @@ function(create_standard_test)
 
   add_executable(test_${TEST_NAME} ${TEST_SOURCES})
 
-  target_link_libraries(test_${TEST_NAME} PUBLIC "")
+  target_link_libraries(test_${TEST_NAME} PUBLIC benchmark)
 
   target_include_directories(test_${TEST_NAME} PRIVATE ${PROJECT_SOURCE_DIR}/include)
 

@@ -19,6 +19,11 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 ################################################################################
+# dependencies
+
+include(cmake/dependencies.cmake)
+
+################################################################################
 # targets
 
 enable_testing()

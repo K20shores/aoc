@@ -5,6 +5,10 @@
 
 #include <aoc2023/trie.hpp>
 
+#include <benchmark/benchmark.h>
+
+Trie t;
+
 // finds the first number represented as 0-9 from the left and right, represents them as a two digit number <left><right> and returns that
 int part1(std::string line)
 {
@@ -44,15 +48,16 @@ int part2(std::string line, const Trie &t)
         }
         else
         {
-            int candidate = t.search(line.substr(i, line.size() - i ));
-            if (candidate != -1) {
+            int candidate = t.search(line.substr(i, line.size() - i));
+            if (candidate != -1)
+            {
                 left = candidate * 10;
                 break;
             }
         }
     }
 
-    for (size_t i = line.size()-1; i >= 0; --i)
+    for (size_t i = line.size() - 1; i >= 0; --i)
     {
         char c = line[i];
         if (std::isdigit(c))
@@ -62,8 +67,9 @@ int part2(std::string line, const Trie &t)
         }
         else
         {
-            int candidate = t.search(line.substr(i, line.size() - i ));
-            if (candidate != -1) {
+            int candidate = t.search(line.substr(i, line.size() - i));
+            if (candidate != -1)
+            {
                 right = candidate;
                 break;
             }
@@ -73,14 +79,43 @@ int part2(std::string line, const Trie &t)
     return left + right;
 }
 
-int main()
+void benchmark_part1(benchmark::State &state)
 {
-    std::ifstream file(std::filesystem::path("inputs/day1.txt"));
-    std::string line;
-    int part1_sum{};
-    int part2_sum{};
+    for (auto _ : state)
+    {
+        std::ifstream file(std::filesystem::path("inputs/day1.txt"));
+        std::string line;
+        int sum{};
 
-    Trie t;
+        while (std::getline(file, line))
+        {
+            sum += part1(line);
+        }
+        benchmark::DoNotOptimize(sum);
+    }
+}
+
+void benchmark_part2(benchmark::State &state)
+{
+    for (auto _ : state)
+    {
+        std::ifstream file(std::filesystem::path("inputs/day1.txt"));
+        std::string line;
+        int sum{};
+
+        while (std::getline(file, line))
+        {
+            sum += part2(line, t);
+        }
+        benchmark::DoNotOptimize(sum);
+    }
+}
+
+BENCHMARK(benchmark_part1);
+BENCHMARK(benchmark_part2);
+
+int main(int argc, char **argv)
+{
     t.insert("zero", 0);
     t.insert("one", 1);
     t.insert("two", 2);
@@ -93,6 +128,11 @@ int main()
     t.insert("nine", 9);
     t.insert("nine", 9);
 
+    std::ifstream file(std::filesystem::path("inputs/day1.txt"));
+    std::string line;
+    int part1_sum{};
+    int part2_sum{};
+
     while (std::getline(file, line))
     {
         part1_sum += part1(line);
@@ -100,4 +140,7 @@ int main()
     }
     std::cout << "Part 1: " << part1_sum << std::endl;
     std::cout << "Part 2: " << part2_sum << std::endl;
+
+    benchmark::Initialize(&argc, argv);
+    benchmark::RunSpecifiedBenchmarks();
 }

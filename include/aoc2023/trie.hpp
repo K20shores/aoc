@@ -59,28 +59,6 @@ public:
         return -1;
     }
 
-    void print()
-    {
-        std::queue<Node *> cue;
-
-        cue.push(&root);
-
-        while (!cue.empty())
-        {
-            Node *x = cue.front();
-            cue.pop();
-            for (const auto &node : x->children)
-            {
-                if (node)
-                {
-                    std::cout << node->value << " ";
-                    cue.push(node);
-                }
-            }
-            std::cout << std::endl;
-        }
-    }
-
 private:
     Node root{};
 };
