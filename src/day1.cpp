@@ -39,24 +39,33 @@ int part2(std::string line, const Trie &t)
         char c = line[i];
         if ((c >= 48) && (c <= 57))
         {
-            int candidate = int(c) - 48;
-            if (left == -1) {
-                left = candidate * 10;
-            }
-            else {
-                right = candidate;
-            }
+            left = (int(c) - 48) * 10;
+            break;
         }
         else
         {
             int candidate = t.search(line.substr(i, line.size() - i ));
             if (candidate != -1) {
-                if (left == -1) {
-                    left = candidate * 10;
-                }
-                else {
-                    right = candidate;
-                }
+                left = candidate * 10;
+                break;
+            }
+        }
+    }
+
+    for (size_t i = line.size()-1; i >= 0; --i)
+    {
+        char c = line[i];
+        if ((c >= 48) && (c <= 57))
+        {
+            right = int(c) - 48;
+            break;
+        }
+        else
+        {
+            int candidate = t.search(line.substr(i, line.size() - i ));
+            if (candidate != -1) {
+                right = candidate;
+                break;
             }
         }
     }
