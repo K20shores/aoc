@@ -43,9 +43,10 @@ public:
         const Node *x = &root;
         for (const auto &c : s)
         {
-            if ('a' <= c && c <= 'z' && x->children[c - 'a'])
+            size_t idx = c - 'a';
+            if ('a' <= c && c <= 'z' && x->children[idx])
             {
-                x = x->children[c - 'a'];
+                x = x->children[idx];
                 if (x->terminal)
                 {
                     return x->value;
