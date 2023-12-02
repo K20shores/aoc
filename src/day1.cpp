@@ -15,11 +15,11 @@ int part1(std::string line)
     // advance them until a number is found
     // take advantage of char's evaluating to strings
     // 0 is ascii 48, 9 is ascii 57, numbers are anything between these two numbers
-    while ((*left < '0') || (*left > '9'))
+    while (left != line.end() && !std::isdigit(*left))
     {
         ++left;
     }
-    while ((*right < '0') || (*right > '9'))
+    while (right != line.rend() && !std::isdigit(*right))
     {
         ++right;
     }
