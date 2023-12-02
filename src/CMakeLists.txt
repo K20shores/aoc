@@ -4,9 +4,10 @@
 include(test_util)
 
 ################################################################################
-# Dependencies
+# Problems
 
 create_standard_test(NAME day1 SOURCES day1.cpp)
+create_standard_test(NAME day2 SOURCES day2.cpp)
 
 ################################################################################
 # Copy input data
