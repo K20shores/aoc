@@ -126,7 +126,6 @@ int main(int argc, char **argv)
     t.insert("seven", 7);
     t.insert("eight", 8);
     t.insert("nine", 9);
-    t.insert("nine", 9);
 
     std::ifstream file(std::filesystem::path("inputs/day1.txt"));
     std::string line;
