@@ -46,7 +46,7 @@ public:
             if ((c >= 97) && (c <= 122) && x->children[c - 97])
             {
                 x = x->children[c - 97];
-                if (x && x->terminal)
+                if (x->terminal)
                 {
                     return x->value;
                 }
