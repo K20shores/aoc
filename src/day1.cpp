@@ -15,16 +15,16 @@ int part1(std::string line)
     // advance them until a number is found
     // take advantage of char's evaluating to strings
     // 0 is ascii 48, 9 is ascii 57, numbers are anything between these two numbers
-    while ((*left < 48) || (*left > 57))
+    while ((*left < '0') || (*left > '9'))
     {
         ++left;
     }
-    while ((*right < 48) || (*right > 57))
+    while ((*right < '0') || (*right > '9'))
     {
         ++right;
     }
     // subtract 48 from each number to get its value, recourd the sum
-    return (int(*left) - 48) * 10 + (int(*right) - 48);
+    return (*left - '0') * 10 + (*right - '0');
 }
 
 // finds the first number represented as 0-9 or zero, one, ..., nine from the left and right, represents them as a two digit number <left><right> and returns that
@@ -37,9 +37,9 @@ int part2(std::string line, const Trie &t)
     for (size_t i = 0; i < line.size(); ++i)
     {
         char c = line[i];
-        if ((c >= 48) && (c <= 57))
+        if ((c >= '0') && (c <= '9'))
         {
-            left = (int(c) - 48) * 10;
+            left = (c - '0') * 10;
             break;
         }
         else
@@ -55,9 +55,9 @@ int part2(std::string line, const Trie &t)
     for (size_t i = line.size()-1; i >= 0; --i)
     {
         char c = line[i];
-        if ((c >= 48) && (c <= 57))
+        if ((c >= '0') && (c <= '9'))
         {
-            right = int(c) - 48;
+            right = c - '0';
             break;
         }
         else

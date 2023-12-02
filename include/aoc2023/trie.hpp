@@ -27,7 +27,7 @@ public:
         Node *x = &root;
         for (const auto &c : key)
         {
-            size_t idx = c - 97;
+            size_t idx = c - 'a';
             if (x->children[idx] == nullptr)
             {
                 x->children[idx] = new Node();
@@ -43,9 +43,9 @@ public:
         const Node *x = &root;
         for (const auto &c : s)
         {
-            if ((c >= 97) && (c <= 122) && x->children[c - 97])
+            if ('a' <= c && c <= 'z' && x->children[c - 'a'])
             {
-                x = x->children[c - 97];
+                x = x->children[c - 'a'];
                 if (x->terminal)
                 {
                     return x->value;
