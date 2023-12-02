@@ -13,20 +13,22 @@ function(create_standard_test)
 
   target_link_libraries(test_${TEST_NAME} PUBLIC "")
 
+  target_include_directories(test_${TEST_NAME} PRIVATE ${PROJECT_SOURCE_DIR}/include)
+
   if(NOT DEFINED TEST_WORKING_DIRECTORY)
     set(TEST_WORKING_DIRECTORY "${CMAKE_BINARY_DIR}")
   endif()
 
-  add_leet_test(${TEST_NAME} test_${TEST_NAME} "" ${TEST_WORKING_DIRECTORY})
+  add_aoc_test(${TEST_NAME} test_${TEST_NAME} "" ${TEST_WORKING_DIRECTORY})
 endfunction(create_standard_test)
 
 ################################################################################
 # Add a test
 
-function(add_leet_test test_name test_binary test_args working_dir)
+function(add_aoc_test test_name test_binary test_args working_dir)
     add_test(NAME ${test_name}
             COMMAND ${test_binary} ${test_args}
             WORKING_DIRECTORY ${working_dir})
-endfunction(add_micm_test)
+endfunction(add_aoc_test)
 
 ################################################################################
