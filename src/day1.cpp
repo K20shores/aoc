@@ -69,9 +69,6 @@ int part2(std::string line, const Trie &t)
             }
         }
     }
-    if (right == -1) {
-        right = left / 10;
-    }
 
     return left + right;
 }
