@@ -49,28 +49,13 @@ int part2(std::string line, const Trie &t)
         }
         else
         {
-            search = t.search(c);
-            if (search)
-            {
-                for (size_t j = i + 1; j < line.size() && search; ++j)
-                {
-                    char d = line[j];
-                    if ((d < 97) || (d > 122))
-                    {
-                        break;
-                    }
-                    search = search->children[d -97];
-                    if (search && search->value != -1)
-                    {
-                        int candidate = search->value;
-                        if (left == -1) {
-                            left = candidate * 10;
-                        }
-                        else {
-                            right = candidate;
-                        }
-                        break;
-                    }
+            int candidate = t.search(line.substr(i, line.size() - i ));
+            if (candidate != -1) {
+                if (left == -1) {
+                    left = candidate * 10;
+                }
+                else {
+                    right = candidate;
                 }
             }
         }

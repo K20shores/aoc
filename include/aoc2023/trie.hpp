@@ -11,8 +11,9 @@ public:
     {
         Node *children[ALPHABET_SIZE];
         int value;
+        bool terminal;
 
-        Node() : value(-1)
+        Node() : value(-1), terminal(false)
         {
             for (int i = 0; i < ALPHABET_SIZE; ++i)
             {
@@ -34,14 +35,28 @@ public:
             x = x->children[idx];
         }
         x->value = val;
+        x->terminal = true;
     }
 
-    Node *search(char c) const
+    int search(const std::string &s) const
     {
-        if ((c < 97) || (c > 122)) {
-            return nullptr;
+        const Node *x = &root;
+        for (const auto &c : s)
+        {
+            if ((c >= 97) && (c <= 122) && x->children[c - 97])
+            {
+                x = x->children[c - 97];
+                if (x && x->terminal)
+                {
+                    return x->value;
+                }
+            }
+            else
+            {
+                break;
+            }
         }
-        return root.children[c - 97];
+        return -1;
     }
 
     void print()
