@@ -10,21 +10,34 @@ bool is_symbol(char c)
 }
 
 // check if a symbol is touching this position in a halo around the position
-bool position_is_near_symbol(const std::vector<std::string> &data, size_t posx, size_t posy)
+char get_char(const std::vector<std::string> &data, size_t x, size_t y)
 {
-  char up = posx > 0 ? data[posx - 1][posy] : '.';
-  char down = posx < data.size() - 1 ? data[posx + 1][posy] : '.';
-  char left = posy > 0 ? data[posx][posy - 1] : '.';
-  char right = posy < data[posx].size() - 1 ? data[posx][posy + 1] : '.';
-  char diag_up_right = ((posx > 0) && (posy < data[posx].size() - 1)) ? data[posx - 1][posy + 1] : '.';
-  char diag_up_left = ((posx > 0) && (posy > 0)) ? data[posx - 1][posy - 1] : '.';
-  char diag_down_right = ((posx < data.size() - 1) && (posy < data[posx].size() - 1)) ? data[posx + 1][posy + 1] : '.';
-  char diag_down_left = ((posx < data.size() - 1) && (posy > 0)) ? data[posx + 1][posy - 1] : '.';
-
-  return is_symbol(up) || is_symbol(down) || is_symbol(left) || is_symbol(right) ||
-         is_symbol(diag_up_right) || is_symbol(diag_up_left) || is_symbol(diag_down_right) || is_symbol(diag_down_left);
+  if (x >= 0 && x < data.size() && y >= 0 && y < data[x].size())
+    return data[x][y];
+  return '.';
 }
 
+bool position_is_near_symbol(const std::vector<std::string> &data, size_t x, size_t y)
+{
+  char neighbors[8] = {
+      get_char(data, x - 1, y),
+      get_char(data, x + 1, y),
+      get_char(data, x, y - 1),
+      get_char(data, x, y + 1),
+      get_char(data, x - 1, y + 1),
+      get_char(data, x - 1, y - 1),
+      get_char(data, x + 1, y + 1),
+      get_char(data, x + 1, y - 1)};
+
+  for (char neighbor : neighbors)
+  {
+    if (is_symbol(neighbor))
+      return true;
+  }
+  return false;
+}
+
+// add up all numbers that are adjacent to a symbol, a symbol is antyhing that's not a number or a '.'
 int count_part1(const std::vector<std::string> &data)
 {
   int sum = 0;
@@ -64,32 +77,34 @@ int count_part1(const std::vector<std::string> &data)
   return sum;
 }
 
-int get_number(const std::vector<std::string> &data, size_t posx, size_t posy)
+// parse a number at a position
+int get_number(const std::vector<std::string> &data, size_t x, size_t y)
 {
   size_t left = 0;
   size_t right = 0;
-  while ((posy - left >= 0) && std::isdigit(data[posx][posy - left]))
+  while ((y - left >= 0) && std::isdigit(data[x][y - left]))
   {
     ++left;
   }
-  while ((posy + right < data[posx].size()) && std::isdigit(data[posx][posy + right]))
+  while ((y + right < data[x].size()) && std::isdigit(data[x][y + right]))
   {
     ++right;
   }
 
-  return std::stoi(data[posx].substr(posy - left + 1, right + left - 1));
+  return std::stoi(data[x].substr(y - left + 1, right + left - 1));
 }
 
-int get_gear_ratio(const std::vector<std::string> &data, size_t posx, size_t posy)
+// find all the numbers around a '*' and return the product if there are exactly two
+int get_gear_ratio(const std::vector<std::string> &data, size_t x, size_t y)
 {
-  char up = posx > 0 ? data[posx - 1][posy] : '.';
-  char down = posx < data.size() - 1 ? data[posx + 1][posy] : '.';
-  char left = posy > 0 ? data[posx][posy - 1] : '.';
-  char right = posy < data[posx].size() - 1 ? data[posx][posy + 1] : '.';
-  char diag_up_right = ((posx > 0) && (posy < data[posx].size() - 1)) ? data[posx - 1][posy + 1] : '.';
-  char diag_up_left = ((posx > 0) && (posy > 0)) ? data[posx - 1][posy - 1] : '.';
-  char diag_down_right = ((posx < data.size() - 1) && (posy < data[posx].size() - 1)) ? data[posx + 1][posy + 1] : '.';
-  char diag_down_left = ((posx < data.size() - 1) && (posy > 0)) ? data[posx + 1][posy - 1] : '.';
+  char up = get_char(data, x - 1, y);
+  char down = get_char(data, x + 1, y);
+  char left = get_char(data, x, y - 1);
+  char right = get_char(data, x, y + 1);
+  char diag_up_right = get_char(data, x - 1, y + 1);
+  char diag_up_left = get_char(data, x - 1, y - 1);
+  char diag_down_right = get_char(data, x + 1, y + 1);
+  char diag_down_left = get_char(data, x + 1, y - 1);
 
   std::vector<int> numbers;
 
@@ -99,33 +114,33 @@ int get_gear_ratio(const std::vector<std::string> &data, size_t posx, size_t pos
     if (std::isdigit(up))
     {
       // there is a number above, doesn't matter if it's all three places
-      numbers.push_back(get_number(data, posx - 1, posy));
+      numbers.push_back(get_number(data, x - 1, y));
     }
     else
     {
       if (std::isdigit(diag_up_left))
       {
-        numbers.push_back(get_number(data, posx - 1, posy - 1));
+        numbers.push_back(get_number(data, x - 1, y - 1));
       }
       if (std::isdigit(diag_up_right))
       {
-        numbers.push_back(get_number(data, posx - 1, posy + 1));
+        numbers.push_back(get_number(data, x - 1, y + 1));
       }
     }
   }
   else if (std::isdigit(up))
   {
     // there's a single number, it's directly up
-    numbers.push_back(get_number(data, posx - 1, posy));
+    numbers.push_back(get_number(data, x - 1, y));
   }
 
   if (std::isdigit(left))
   {
-    numbers.push_back(get_number(data, posx, posy - 1));
+    numbers.push_back(get_number(data, x, y - 1));
   }
   if (std::isdigit(right))
   {
-    numbers.push_back(get_number(data, posx, posy + 1));
+    numbers.push_back(get_number(data, x, y + 1));
   }
 
   if (std::isdigit(diag_down_left) || std::isdigit(diag_down_right))
@@ -133,29 +148,30 @@ int get_gear_ratio(const std::vector<std::string> &data, size_t posx, size_t pos
     if (std::isdigit(down))
     {
       // there is a number below, doesn't matter if it's all three places
-      numbers.push_back(get_number(data, posx + 1, posy));
+      numbers.push_back(get_number(data, x + 1, y));
     }
     else
     {
       if (std::isdigit(diag_down_left))
       {
-        numbers.push_back(get_number(data, posx + 1, posy - 1));
+        numbers.push_back(get_number(data, x + 1, y - 1));
       }
       if (std::isdigit(diag_down_right))
       {
-        numbers.push_back(get_number(data, posx + 1, posy + 1));
+        numbers.push_back(get_number(data, x + 1, y + 1));
       }
     }
   }
   else if (std::isdigit(down))
   {
     // there's a single number, it's directly down
-    numbers.push_back(get_number(data, posx + 1, posy));
+    numbers.push_back(get_number(data, x + 1, y));
   }
 
   return numbers.size() == 2 ? numbers[0] * numbers[1] : 0;
 }
 
+// find '*' and compute the gear ratio
 int gear_ratio(const std::vector<std::string> &data)
 {
   int sum = 0;
