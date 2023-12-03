@@ -8,6 +8,7 @@ include(test_util)
 
 create_standard_test(NAME day1 SOURCES day1.cpp)
 create_standard_test(NAME day2 SOURCES day2.cpp)
+create_standard_test(NAME day3 SOURCES day3.cpp)
 
 ################################################################################
 # Copy input data
