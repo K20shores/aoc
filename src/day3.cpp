@@ -45,9 +45,11 @@ int count_part1(const std::vector<std::string> &data)
   {
     size_t num_start = -1;
     bool keep = false;
-    for (size_t j = 0; j < data[i].size(); ++j)
+    for (size_t j = 0; j <= data[i].size(); ++j)
     {
-      if (std::isdigit(data[i][j]))
+      char current_char = (j < data[i].size()) ? data[i][j] : '.';
+
+      if (std::isdigit(current_char))
       {
         if (num_start == -1)
         {
@@ -66,11 +68,6 @@ int count_part1(const std::vector<std::string> &data)
         }
         keep = false;
         num_start = -1;
-      }
-      // there is a number at the edge
-      if ((j == data[i].size() - 1) && (num_start != -1 && keep))
-      {
-        sum += std::stoi(data[i].substr(num_start));
       }
     }
   }
