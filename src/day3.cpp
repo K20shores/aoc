@@ -209,5 +209,5 @@ int main()
   int part2_gear_ratio = gear_ratio(data);
 
   std::cout << "Part 1: " << part1_sum << std::endl;
-  std::cout << "Part 1: " << part2_gear_ratio << std::endl;
+  std::cout << "Part 2: " << part2_gear_ratio << std::endl;
 }
