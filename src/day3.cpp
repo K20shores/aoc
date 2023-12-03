@@ -143,6 +143,7 @@ int get_gear_ratio(const std::vector<std::string> &data, size_t x, size_t y)
     numbers.push_back(get_number(data, x, y + 1));
   }
 
+  // any numbers below
   if (std::isdigit(diag_down_left) || std::isdigit(diag_down_right))
   {
     if (std::isdigit(down))
