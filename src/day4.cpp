@@ -35,7 +35,7 @@ int part1(const std::vector<std::pair<std::vector<int>, std::vector<int>>>& data
 int part2(const std::vector<std::pair<std::vector<int>, std::vector<int>>>& data) {
   std::vector<int> copies(data.size(), 1);
   for(size_t i = 0; i < data.size(); ++i){
-    auto pair = data[i];
+    const auto& pair = data[i];
     auto winning_nums = pair.first.begin();
     auto player_nums = pair.second.begin();
     int matches = 0;
@@ -57,7 +57,7 @@ int part2(const std::vector<std::pair<std::vector<int>, std::vector<int>>>& data
       copies[j] += 1 * copies[i];
     }
   }
-  return std::accumulate(copies.begin(), copies.end(), 0);;
+  return std::accumulate(copies.begin(), copies.end(), 0);
 }
 
 std::vector<std::pair<std::vector<int>, std::vector<int>>> parse()
