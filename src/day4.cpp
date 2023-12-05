@@ -5,6 +5,7 @@
 #include <vector>
 #include <utility>
 #include <numeric>
+#include <benchmark/benchmark.h>
 
 int part1(const std::vector<std::pair<std::vector<int>, std::vector<int>>>& data) {
   int sum = 0;
@@ -59,7 +60,7 @@ int part2(const std::vector<std::pair<std::vector<int>, std::vector<int>>>& data
   return std::accumulate(copies.begin(), copies.end(), 0);;
 }
 
-int main()
+std::vector<std::pair<std::vector<int>, std::vector<int>>> parse()
 {
   std::ifstream file(std::filesystem::path("inputs/day4.txt"));
   std::string line;
@@ -98,10 +99,49 @@ int main()
     std::sort(row.second.begin(), row.second.end());
     data.push_back(row);
   }
+  return data;
+}
+
+class BenchmarkFixture : public benchmark::Fixture {
+public:
+    void SetUp(const benchmark::State& state) override {
+        data = parse();
+    }
+
+    void TearDown(const benchmark::State&) override {
+        // Clean up if needed
+        data.clear();
+    }
+
+    std::vector<std::pair<std::vector<int>, std::vector<int>>> data;
+};
+
+BENCHMARK_DEFINE_F(BenchmarkFixture, Part1Benchmark)(benchmark::State& state) {
+    for (auto _ : state) {
+        int sum = part1(data);
+        benchmark::DoNotOptimize(sum);
+    }
+}
+
+BENCHMARK_DEFINE_F(BenchmarkFixture, Part2Benchmark)(benchmark::State& state) {
+    for (auto _ : state) {
+        int sum = part2(data);
+        benchmark::DoNotOptimize(sum);
+    }
+}
+
+BENCHMARK_REGISTER_F(BenchmarkFixture, Part1Benchmark);
+BENCHMARK_REGISTER_F(BenchmarkFixture, Part2Benchmark);
+
+int main(int argc, char** argv) {
+  std::vector<std::pair<std::vector<int>, std::vector<int>>> data = parse();
 
   int part1_sum = part1(data);
   int part2_sum = part2(data);
 
   std::cout << "Part 1: " << part1_sum << std::endl;
   std::cout << "Part 2: " << part2_sum << std::endl;
+
+  benchmark::Initialize(&argc, argv);
+  benchmark::RunSpecifiedBenchmarks();
 }
