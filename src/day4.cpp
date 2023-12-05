@@ -4,13 +4,13 @@
 #include <string>
 #include <vector>
 #include <utility>
+#include <numeric>
 
 int part1(const std::vector<std::pair<std::vector<int>, std::vector<int>>>& data) {
   int sum = 0;
   for(const auto& pair : data){
     auto winning_nums = pair.first.begin();
     auto player_nums = pair.second.begin();
-    int card_winnings = 0;
     int matches = 0;
     while (winning_nums != pair.first.end() && player_nums != pair.second.end()) {
       if (*winning_nums == *player_nums) {
@@ -31,8 +31,32 @@ int part1(const std::vector<std::pair<std::vector<int>, std::vector<int>>>& data
   return sum;
 }
 
-int part2() {
-
+int part2(const std::vector<std::pair<std::vector<int>, std::vector<int>>>& data) {
+  std::vector<int> copies(data.size(), 1);
+  for(size_t i = 0; i < data.size(); ++i){
+    auto pair = data[i];
+    auto winning_nums = pair.first.begin();
+    auto player_nums = pair.second.begin();
+    int matches = 0;
+    while (winning_nums != pair.first.end() && player_nums != pair.second.end()) {
+      if (*winning_nums == *player_nums) {
+        ++matches;
+        ++winning_nums;
+        ++player_nums;
+        continue;
+      }
+      if (*winning_nums < *player_nums) {
+        ++winning_nums;
+      }
+      else if (*player_nums < *winning_nums) {
+        ++player_nums;
+      }
+    }
+    for(size_t j = i+1; j <= i+matches; ++j) {
+      copies[j] += 1 * copies[i];
+    }
+  }
+  return std::accumulate(copies.begin(), copies.end(), 0);;
 }
 
 int main()
@@ -76,7 +100,7 @@ int main()
   }
 
   int part1_sum = part1(data);
-  int part2_sum = part2();
+  int part2_sum = part2(data);
 
   std::cout << "Part 1: " << part1_sum << std::endl;
   std::cout << "Part 2: " << part2_sum << std::endl;
