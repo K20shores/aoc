@@ -55,7 +55,7 @@ int part2(const std::vector<std::pair<std::vector<int>, std::vector<int>>>& data
       }
     }
     for(size_t j = i+1; j <= i+matches; ++j) {
-      copies[j] += 1 * copies[i];
+      copies[j] += copies[i];
     }
     sum += copies[i];
   }
