@@ -27,7 +27,7 @@ int part1(const std::vector<std::pair<std::vector<int>, std::vector<int>>>& data
         ++player_nums;
       }
     }
-    sum += std::pow(2, matches-1) * (matches > 0);
+    sum += 1 << (matches - 1) * (matches > 0);
   }
   return sum;
 }
