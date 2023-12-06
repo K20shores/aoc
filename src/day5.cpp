@@ -35,6 +35,10 @@ long part1(const Data &data)
           location = (location - range.src) + range.dest;
           break;
         }
+        if (location < range.src)
+        {
+          break;
+        }
       }
     }
     min = std::min(min, location);
@@ -59,6 +63,10 @@ int part2(const Data &data)
           if (location >= range.src && location < range.src + range.range)
           {
             location = (location - range.src) + range.dest;
+            break;
+          }
+          if (location < range.src)
+          {
             break;
           }
         }
@@ -89,6 +97,11 @@ std::vector<long> parse_numbers(const std::string &line)
     }
   }
   return numbers;
+}
+
+bool compare_ranges(const Range &a, const Range &b)
+{
+  return a.src < b.src;
 }
 
 Data parse()
@@ -124,6 +137,11 @@ Data parse()
   if (ranges.size() > 0)
   {
     data.ranges.push_back(ranges);
+  }
+
+  for (auto &range : data.ranges)
+  {
+    std::sort(range.begin(), range.end(), compare_ranges);
   }
 
   return data;
