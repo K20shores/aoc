@@ -4,7 +4,6 @@
 #include <string>
 #include <vector>
 #include <utility>
-#include <numeric>
 #include <benchmark/benchmark.h>
 
 int part1(const std::vector<std::pair<std::vector<int>, std::vector<int>>>& data) {
@@ -106,17 +105,10 @@ std::vector<std::pair<std::vector<int>, std::vector<int>>> parse()
 
 class BenchmarkFixture : public benchmark::Fixture {
 public:
-    void SetUp(const benchmark::State& state) override {
-        data = parse();
-    }
-
-    void TearDown(const benchmark::State&) override {
-        // Clean up if needed
-        data.clear();
-    }
-
-    std::vector<std::pair<std::vector<int>, std::vector<int>>> data;
+    static std::vector<std::pair<std::vector<int>, std::vector<int>>> data;
 };
+
+std::vector<std::pair<std::vector<int>, std::vector<int>>> BenchmarkFixture::data = parse();
 
 BENCHMARK_DEFINE_F(BenchmarkFixture, Part1Benchmark)(benchmark::State& state) {
     for (auto _ : state) {
