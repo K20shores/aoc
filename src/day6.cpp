@@ -4,7 +4,6 @@
 #include <string>
 #include <vector>
 #include <benchmark/benchmark.h>
-#include <sstream>
 
 struct Data
 {
@@ -14,20 +13,10 @@ struct Data
 
 long quad_solution(long T, long D)
 {
-  double x1 = (T + std::sqrt(std::pow(T, 2) - 4 * D)) / 2;
-  double x2 = (T - std::sqrt(std::pow(T, 2) - 4 * D)) / 2;
-  int maximum = std::floor(double(T) / 2);
-  int left_minimum = std::ceil(std::min(x1, x2));
-  if (T % 2 == 0)
-  {
-    // T is exactaly the maximum
-    return (maximum - left_minimum) * 2 - 1;
-  }
-  else
-  {
-    // T is the first integer to the left of the maximum
-    return (maximum - left_minimum + 1) * 2;
-  }
+  double disc = std::sqrt(T*T - 4 * D);
+  long x = std::ceil((T - disc) / 2);
+  long y = std::floor((T + disc) / 2);
+  return y-x+1 - 2 * (((x*T - x*x) - D) == 0);
 }
 
 long part1(const Data &data)
