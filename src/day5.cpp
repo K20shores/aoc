@@ -23,12 +23,11 @@ struct Data
 long part1(const Data &data)
 {
   long min = LONG_MAX;
-  std::vector<long> seed_locations = data.seeds;
-  for (const auto &ranges : data.ranges)
+  for (const auto& seed: data.seeds)
   {
-    for (size_t seed = 0; seed < data.seeds.size(); ++seed)
+    long location = seed;
+    for (const auto &ranges : data.ranges)
     {
-      long location = seed_locations[seed];
       for (const auto &range : ranges)
       {
         if (location >= range.src && location < range.src + range.range)
@@ -37,12 +36,8 @@ long part1(const Data &data)
           break;
         }
       }
-      seed_locations[seed] = location;
     }
-  }
-  for (auto &loc : seed_locations)
-  {
-    min = std::min(min, loc);
+    min = std::min(min, location);
   }
   return min;
 }
