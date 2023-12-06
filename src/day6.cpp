@@ -16,7 +16,7 @@ long quad_solution(long T, long D)
   double disc = std::sqrt(T*T - 4 * D);
   long x = std::ceil((T - disc) / 2);
   long y = std::floor((T + disc) / 2);
-  return y-x+1 - 2 * (((x*T - x*x) - D) == 0);
+  return y-x+1 - 2 * (T % 2 == 0);
 }
 
 long part1(const Data &data)
