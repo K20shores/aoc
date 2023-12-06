@@ -23,7 +23,7 @@ struct Data
 long part1(const Data &data)
 {
   long min = LONG_MAX;
-  for (const auto& seed: data.seeds)
+  for (const auto &seed : data.seeds)
   {
     long location = seed;
     for (const auto &ranges : data.ranges)
@@ -44,8 +44,29 @@ long part1(const Data &data)
 
 int part2(const Data &data)
 {
-  int sum = 0;
-  return sum;
+  long min = LONG_MAX;
+  for (size_t i = 0; i < data.seeds.size(); i += 2)
+  {
+    long start = data.seeds[i];
+    long n = data.seeds[i + 1];
+    for (long seed = start; seed < start + n; ++seed)
+    {
+      long location = seed;
+      for (const auto &ranges : data.ranges)
+      {
+        for (const auto &range : ranges)
+        {
+          if (location >= range.src && location < range.src + range.range)
+          {
+            location = (location - range.src) + range.dest;
+            break;
+          }
+        }
+      }
+      min = std::min(min, location);
+    }
+  }
+  return min;
 }
 
 std::vector<long> parse_numbers(const std::string &line)
@@ -121,8 +142,8 @@ BENCHMARK_DEFINE_F(BenchmarkFixture, Part1Benchmark)
 {
   for (auto _ : state)
   {
-    int sum = part1(data);
-    benchmark::DoNotOptimize(sum);
+    int s = part1(data);
+    benchmark::DoNotOptimize(s);
   }
 }
 
@@ -131,8 +152,8 @@ BENCHMARK_DEFINE_F(BenchmarkFixture, Part2Benchmark)
 {
   for (auto _ : state)
   {
-    int sum = part2(data);
-    benchmark::DoNotOptimize(sum);
+    int s = part2(data);
+    benchmark::DoNotOptimize(s);
   }
 }
 
