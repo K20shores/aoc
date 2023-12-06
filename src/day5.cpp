@@ -7,17 +7,17 @@
 #include <numeric>
 #include <benchmark/benchmark.h>
 
-struct Range
+struct Mapping
 {
   long src;
   long dest;
-  long range;
+  long length;
 };
 
 struct Data
 {
   std::vector<long> seeds;
-  std::vector<std::vector<Range>> ranges;
+  std::vector<std::vector<Mapping>> ranges;
 };
 
 long part1(const Data &data)
@@ -30,7 +30,7 @@ long part1(const Data &data)
     {
       for (const auto &range : ranges)
       {
-        if (location >= range.src && location < range.src + range.range)
+        if (location >= range.src && location < range.src + range.length)
         {
           location = (location - range.src) + range.dest;
           break;
@@ -60,7 +60,7 @@ int part2(const Data &data)
       {
         for (const auto &range : ranges)
         {
-          if (location >= range.src && location < range.src + range.range)
+          if (location >= range.src && location < range.src + range.length)
           {
             location = (location - range.src) + range.dest;
             break;
@@ -99,7 +99,7 @@ std::vector<long> parse_numbers(const std::string &line)
   return numbers;
 }
 
-bool compare_ranges(const Range &a, const Range &b)
+bool compare_mappings(const Mapping &a, const Mapping &b)
 {
   return a.src < b.src;
 }
@@ -110,7 +110,7 @@ Data parse()
   std::string line;
   Data data;
 
-  std::vector<Range> ranges;
+  std::vector<Mapping> ranges;
   while (std::getline(file, line))
   {
     if (line.starts_with("seeds:"))
@@ -130,7 +130,7 @@ Data parse()
       else if (std::isdigit(line[0]))
       {
         auto numbers = parse_numbers(line);
-        ranges.push_back({.src = numbers[1], .dest = numbers[0], .range = numbers[2]});
+        ranges.push_back({.src = numbers[1], .dest = numbers[0], .length = numbers[2]});
       }
     }
   }
@@ -141,7 +141,7 @@ Data parse()
 
   for (auto &range : data.ranges)
   {
-    std::sort(range.begin(), range.end(), compare_ranges);
+    std::sort(range.begin(), range.end(), compare_mappings);
   }
 
   return data;
