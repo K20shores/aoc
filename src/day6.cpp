@@ -12,51 +12,12 @@ struct Data
   std::vector<int> distance;
 };
 
-int part1(const Data &data)
+long quad_solution(long T, long D)
 {
-  int result = 1;
-  for (size_t i = 0; i < data.times.size(); ++i)
-  {
-    int T = data.times[i];
-    int D = data.distance[i];
-    double x1 = (T + std::sqrt(std::pow(T, 2) - 4 * D)) / 2;
-    double x2 = (T - std::sqrt(std::pow(T, 2) - 4 * D)) / 2;
-    int maximum = std::floor(double(T) / 2);
-    int left_minimum = std::ceil(std::min(x1, x2));
-    if (T % 2 == 0)
-    {
-      // T is exactaly the maximum
-      result *= (maximum - left_minimum) * 2 - 1;
-    }
-    else
-    {
-      // T is the first integer to the left of the maximum
-      result *= (maximum - left_minimum + 1) * 2;
-    }
-  }
-  return result;
-}
-
-long part2(const Data &data)
-{
-  std::stringstream combine_T;
-  std::stringstream combine_D;
-  for (size_t i = 0; i < data.times.size(); ++i)
-  {
-    combine_D << data.distance[i];
-    combine_T << data.times[i];
-  }
-
-  long T = 0;
-  long D = 0;
-  combine_D >> D;
-  combine_T >> T;
-
   double x1 = (T + std::sqrt(std::pow(T, 2) - 4 * D)) / 2;
   double x2 = (T - std::sqrt(std::pow(T, 2) - 4 * D)) / 2;
-  long maximum = std::floor(double(T) / 2);
-  long left_minimum = std::ceil(std::min(x1, x2));
-
+  int maximum = std::floor(double(T) / 2);
+  int left_minimum = std::ceil(std::min(x1, x2));
   if (T % 2 == 0)
   {
     // T is exactaly the maximum
@@ -67,6 +28,29 @@ long part2(const Data &data)
     // T is the first integer to the left of the maximum
     return (maximum - left_minimum + 1) * 2;
   }
+}
+
+long part1(const Data &data)
+{
+  long result = 1;
+  for (size_t i = 0; i < data.times.size(); ++i)
+  {
+    result *= quad_solution(data.times[i], data.distance[i]);
+  }
+  return result;
+}
+
+long part2(const Data &data)
+{
+  std::string T = "";
+  std::string D = "";
+  for (size_t i = 0; i < data.times.size(); ++i)
+  {
+    T += std::to_string(data.times[i]);
+    D += std::to_string(data.distance[i]);
+  }
+
+  return quad_solution(std::stol(T), std::stol(D));
 }
 
 std::vector<int> parse_numbers(const std::string &line)
