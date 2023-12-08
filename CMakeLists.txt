@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 3.21)
 
 project(
   aoc2023
-  VERSION 3.2.0
+  VERSION 0.0.2023
   LANGUAGES CXX
 )
 
