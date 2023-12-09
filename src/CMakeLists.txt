@@ -13,6 +13,7 @@ create_standard_test(NAME day4 SOURCES day4.cpp)
 create_standard_test(NAME day5 SOURCES day5.cpp)
 create_standard_test(NAME day6 SOURCES day6.cpp)
 create_standard_test(NAME day7 SOURCES day7.cpp)
+create_standard_test(NAME day8 SOURCES day8.cpp)
 
 ################################################################################
 # Copy input data
