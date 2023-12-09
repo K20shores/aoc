@@ -34,9 +34,29 @@ int part1(Data data)
   return sum;
 }
 
-int part2(const Data &data)
+int part2(Data &data)
 {
-  return 0;
+  int sum = 0;
+  for(auto& sequence : data.sequences) {
+    std::reverse(sequence.begin(), sequence.end());
+    for(int i = sequence.size() - 1; i >= 0; --i){
+      for(size_t j = 0; j < i; ++j) {
+        sequence[j] = sequence[j+1] - sequence[j];
+      }
+      size_t l = 1;
+      long diff = sequence[0];
+      while(diff == sequence[l] && l < i){
+        ++l;
+      }
+      if (l == i) {
+        for(size_t k = l - 1; k < sequence.size(); ++k) {
+          sum += sequence[k];
+        }
+        break;
+      }
+    }
+  }
+  return sum;
 }
 
 std::vector<long> parse_numbers(const std::string &line)
