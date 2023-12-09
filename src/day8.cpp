@@ -5,11 +5,13 @@
 #include <vector>
 #include <benchmark/benchmark.h>
 
+#include <aoc2023/maths.hpp>
+
 struct Node
 {
   std::string val;
-  Node* left = nullptr;
-  Node* right = nullptr;
+  Node *left = nullptr;
+  Node *right = nullptr;
 
   Node(std::string v) : val(v) {}
 };
@@ -17,7 +19,17 @@ struct Node
 struct Data
 {
   std::string directions;
-  Node* root;
+  Node *root;
+  std::vector<Node *> a_nodes;
+  std::vector<Node *> nodes;
+
+  ~Data()
+  {
+    for (auto &n : nodes)
+    {
+      delete n;
+    }
+  }
 };
 
 int part1(const Data &data)
@@ -25,11 +37,14 @@ int part1(const Data &data)
   int steps = 0;
   auto node = data.root;
   size_t direction = 0;
-  while(node->val != "ZZZ") {
-    if (data.directions[direction] == 'L') {
+  while (node->val != "ZZZ")
+  {
+    if (data.directions[direction] == 'L')
+    {
       node = node->left;
     }
-    else {
+    else
+    {
       node = node->right;
     }
     direction = (direction + 1) % data.directions.size();
@@ -38,9 +53,32 @@ int part1(const Data &data)
   return steps;
 }
 
-int part2(const Data &data)
+long part2(const Data &data)
 {
-  return 0;
+  std::vector<int> paths;
+  for (Node *node : data.a_nodes)
+  {
+    int steps = 0;
+    size_t direction = 0;
+    while (node->val[2] != 'Z')
+    {
+      if (data.directions[direction] == 'L')
+      {
+        node = node->left;
+      }
+      else
+      {
+        node = node->right;
+      }
+      direction = (direction + 1) % data.directions.size();
+      ++steps;
+    }
+    paths.push_back(steps);
+  }
+  size_t max = 0;
+  for(auto p : paths) max = p > max ? p : max;
+  const auto primes = get_primes(max);
+  return lcm(paths, primes);
 }
 
 std::tuple<std::string, std::string, std::string> parse_node(const std::string &line)
@@ -73,15 +111,18 @@ std::tuple<std::string, std::string, std::string> parse_node(const std::string &
   return node;
 }
 
-void set_node_info(std::map<std::string, Node*>& m, const std::tuple<std::string, std::string, std::string>& node_info)
+void set_node_info(std::map<std::string, Node *> &m, const std::tuple<std::string, std::string, std::string> &node_info, Data &d)
 {
   auto node = std::get<0>(node_info);
-  Node* root = nullptr;
-  if (m.find(node) == m.end()) {
+  Node *root = nullptr;
+  if (m.find(node) == m.end())
+  {
     root = new Node(node);
+    d.nodes.push_back(root);
     m[node] = root;
   }
-  else {
+  else
+  {
     root = m[node];
   }
 
@@ -90,6 +131,7 @@ void set_node_info(std::map<std::string, Node*>& m, const std::tuple<std::string
   if (it == m.end())
   {
     auto left = new Node(node);
+    d.nodes.push_back(left);
     m[node] = left;
     root->left = left;
   }
@@ -103,6 +145,7 @@ void set_node_info(std::map<std::string, Node*>& m, const std::tuple<std::string
   if (it == m.end())
   {
     auto right = new Node(node);
+    d.nodes.push_back(right);
     m[node] = right;
     root->right = right;
   }
@@ -124,15 +167,26 @@ Data parse()
   // skip the blank line
   std::getline(file, line);
 
-  std::map<std::string, Node*> m;
+  std::map<std::string, Node *> m;
 
   while (std::getline(file, line))
   {
     auto node_info = parse_node(line);
-    set_node_info(m, node_info);
+    set_node_info(m, node_info, data);
   }
 
-  data.root = m["AAA"];
+  auto aaa = m.find("AAA");
+  if (aaa != m.end()) {
+    data.root = m["AAA"];
+  }
+
+  for (auto &it : m)
+  {
+    if (it.second->val.ends_with('A'))
+    {
+      data.a_nodes.push_back(it.second);
+    }
+  }
 
   return data;
 }
@@ -175,6 +229,6 @@ int main(int argc, char **argv)
   std::cout << "Part 1: " << part1(data) << std::endl;
   std::cout << "Part 2: " << part2(data) << std::endl;
 
-  // benchmark::Initialize(&argc, argv);
-  // benchmark::RunSpecifiedBenchmarks();
+  benchmark::Initialize(&argc, argv);
+  benchmark::RunSpecifiedBenchmarks();
 }
