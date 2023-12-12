@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <benchmark/benchmark.h>
+#include <queue>
 
 struct Pos
 {
@@ -31,7 +32,7 @@ char get_char(const std::vector<std::string> &data, Pos cur)
 {
   if (cur.i >= 0 && cur.i < data.size() && cur.j >= 0 && cur.j < data[cur.i].size())
     return data[cur.i][cur.j];
-  return '.';
+  return '\0';
 }
 
 std::vector<Pos> connected_pipes(const Pos &cur, const Data &data)
@@ -145,9 +146,94 @@ int part1(const Data &data)
   return steps;
 }
 
-int part2(const Data &data)
+int floodfill(const Pos &cur, Data &data, const std::vector<Pos> &loop, char fill_char = '0', char loop_char = '*')
 {
-  return 0;
+  std::queue<Pos> working_set;
+  working_set.push(cur);
+  int filled = 0;
+  while (!working_set.empty())
+  {
+    Pos p = working_set.front();
+    working_set.pop();
+    char &c = data.pipes[p.i][p.j];
+    if (c != fill_char && c != loop_char)
+    {
+      ++filled;
+      c = fill_char;
+      // not
+      size_t i = p.i, j = p.j;
+      Pos up = {.i = i - 1, .j = j};
+      Pos down = {.i = i + 1, .j = j};
+      Pos left = {.i = i, .j = j - 1};
+      Pos right = {.i = i, .j = j + 1};
+
+      char upc = get_char(data.pipes, up);
+      char downc = get_char(data.pipes, down);
+      char leftc = get_char(data.pipes, left);
+      char rightc = get_char(data.pipes, right);
+
+      if (upc != '*' && upc != '0' && upc != '\0')
+        working_set.push(up);
+      if (downc != '*' && downc != '0' && downc != '\0')
+        working_set.push(down);
+      if (leftc != '*' && leftc != '0' && leftc != '\0')
+        working_set.push(left);
+      if (rightc != '*' && rightc != '0' && rightc != '\0')
+        working_set.push(right);
+    }
+  }
+  return filled;
+}
+
+int part2(Data data)
+{
+  // get the path
+  auto connected = connected_pipes(data.S, data);
+  std::vector<Pos> loop;
+  loop.reserve(data.pipes.size() * data.pipes[0].size());
+  loop.push_back(data.S);
+  Pos last_iter1 = data.S;
+  Pos last_iter2 = data.S;
+  Pos iter1 = connected[0];
+  Pos iter2 = connected[1];
+  loop.push_back(iter1);
+  loop.push_back(iter2);
+
+  while (true)
+  {
+    advance(iter1, last_iter1, data);
+    advance(iter2, last_iter2, data);
+    if (iter1 != iter2) {
+      loop.push_back(iter1);
+      loop.push_back(iter2);
+    }
+    else {
+      loop.push_back(iter1);
+      break;
+    }
+  }
+
+  // replace all loop cells with '*'
+  for(const auto& p : loop) data.pipes[p.i][p.j] = '*';
+
+  int internal = 0;
+  // now, traverse the loop counterclockwise 
+  // maintain a vector that points orthogonally inward to the loop
+  // any cell that this orthogonal vector points towards that is
+  // not on the loop, is contained within the loop 
+  // count the area that is filled
+  for (size_t i = 0; i < data.pipes.size(); ++i)
+  {
+    for (size_t j = 0; j < data.pipes[0].size(); ++j)
+    {
+      floodfill({i, j}, data, loop);
+    }
+  }
+  for (const auto &row : data.pipes)
+  {
+    std::cout << row << std::endl;
+  }
+  return internal;
 }
 
 Data parse()
@@ -206,8 +292,17 @@ int main(int argc, char **argv)
 {
   Data data = parse();
 
-  std::cout << "Part 1: " << part1(data) << std::endl;
-  std::cout << "Part 2: " << part2(data) << std::endl;
+  int answer1 = 6697;
+  int answer2 = 1;
+
+  auto first = part1(data);
+  auto second = part2(data);
+
+  std::cout << "Part 1: " << first << std::endl;
+  std::cout << "Part 2: " << second << std::endl;
+
+  first != answer1 ? throw std::runtime_error("Part 1 incorrect") : nullptr;
+  second != answer2 ? throw std::runtime_error("Part 2 incorrect") : nullptr;
 
   benchmark::Initialize(&argc, argv);
   benchmark::RunSpecifiedBenchmarks();

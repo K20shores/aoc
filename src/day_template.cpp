@@ -67,8 +67,17 @@ int main(int argc, char **argv)
 {
   Data data = parse();
 
-  std::cout << "Part 1: " << part1(data) << std::endl;
-  std::cout << "Part 2: " << part2(data) << std::endl;
+  int answer1 = 0;
+  int answer2 = 0;
+
+  auto first = part1(data);
+  auto second = part2(data);
+
+  std::cout << "Part 1: " << first << std::endl;
+  std::cout << "Part 2: " << second << std::endl;
+
+  first != answer1 ? throw std::runtime_error("Part 1 incorrect") : nullptr;
+  second != answer2 ? throw std::runtime_error("Part 2 incorrect") : nullptr;
 
   benchmark::Initialize(&argc, argv);
   benchmark::RunSpecifiedBenchmarks();
