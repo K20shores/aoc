@@ -5,22 +5,7 @@
 #include <vector>
 #include <benchmark/benchmark.h>
 #include <queue>
-
-struct Pos
-{
-  size_t i;
-  size_t j;
-
-  bool operator==(const Pos &other) const
-  {
-    return (i == other.i) && (j == other.j);
-  }
-
-  bool operator!=(const Pos &other) const
-  {
-    return !(*this == other);
-  }
-};
+#include <aoc2023/position.hpp>
 
 struct Data
 {
