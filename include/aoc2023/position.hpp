@@ -4,8 +4,8 @@
 
 struct Pos
 {
-  size_t i;
-  size_t j;
+  long i;
+  long j;
 
   bool operator==(const Pos &other) const
   {
@@ -15,5 +15,35 @@ struct Pos
   bool operator!=(const Pos &other) const
   {
     return !(*this == other);
+  }
+
+  Pos operator+(const Pos &other) const
+  {
+    Pos result;
+    result.i = this->i + other.i;
+    result.j = this->j + other.j;
+    return result;
+  }
+
+  Pos operator-(const Pos &other) const
+  {
+    Pos result;
+    result.i = this->i - other.i;
+    result.j = this->j - other.j;
+    return result;
+  }
+
+  Pos &operator+=(const Pos &other)
+  {
+    this->i += other.i;
+    this->j += other.j;
+    return *this;
+  }
+
+  Pos &operator-=(const Pos &other)
+  {
+    this->i -= other.i;
+    this->j -= other.j;
+    return *this;
   }
 };

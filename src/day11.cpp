@@ -18,10 +18,10 @@ int part1(const Data &data)
   std::vector<size_t> empty_columns;
   std::vector<Pos> positions;
 
-  for (size_t i = 0; i < data.lines.size(); ++i)
+  for (long i = 0; i < data.lines.size(); ++i)
   {
     bool found = false;
-    for (size_t j = 0; j < data.lines[i].size(); ++j)
+    for (long j = 0; j < data.lines[i].size(); ++j)
     {
       if (data.lines[i][j] == '#')
       {
@@ -85,10 +85,10 @@ long part2(const Data &data)
   std::vector<size_t> empty_columns;
   std::vector<Pos> positions;
 
-  for (size_t i = 0; i < data.lines.size(); ++i)
+  for (long i = 0; i < data.lines.size(); ++i)
   {
     bool found = false;
-    for (size_t j = 0; j < data.lines[i].size(); ++j)
+    for (long j = 0; j < data.lines[i].size(); ++j)
     {
       if (data.lines[i][j] == '#')
       {
@@ -195,8 +195,8 @@ int main(int argc, char **argv)
 {
   Data data = parse();
 
-  int answer1 = 9521776;
-  int answer2 = 0;
+  long answer1 = 9521776;
+  long answer2 = 553224415344;
 
   auto first = part1(data);
   auto second = part2(data);

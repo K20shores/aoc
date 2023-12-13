@@ -22,7 +22,7 @@ char get_char(const std::vector<std::string> &data, Pos cur)
 
 std::vector<Pos> connected_pipes(const Pos &cur, const Data &data)
 {
-  size_t i = cur.i, j = cur.j;
+  long i = cur.i, j = cur.j;
 
   Pos up = {.i = i - 1, .j = j};
   Pos down = {.i = i + 1, .j = j};
@@ -131,7 +131,7 @@ int part1(const Data &data)
   return steps;
 }
 
-int floodfill(const Pos &cur, Data &data, const std::vector<Pos> &loop, char fill_char = '0', char loop_char = '*')
+int floodfill(const Pos &cur, Data &data, char fill_char = '0', char loop_char = '*')
 {
   std::queue<Pos> working_set;
   working_set.push(cur);
@@ -145,8 +145,7 @@ int floodfill(const Pos &cur, Data &data, const std::vector<Pos> &loop, char fil
     {
       ++filled;
       c = fill_char;
-      // not
-      size_t i = p.i, j = p.j;
+      long i = p.i, j = p.j;
       Pos up = {.i = i - 1, .j = j};
       Pos down = {.i = i + 1, .j = j};
       Pos left = {.i = i, .j = j - 1};
@@ -184,36 +183,45 @@ int part2(Data data)
   loop.push_back(iter1);
   loop.push_back(iter2);
 
-  while (true)
+  while (iter1 != iter2)
   {
     advance(iter1, last_iter1, data);
     advance(iter2, last_iter2, data);
-    if (iter1 != iter2) {
-      loop.push_back(iter1);
-      loop.push_back(iter2);
-    }
-    else {
-      loop.push_back(iter1);
-      break;
-    }
+    loop.push_back(iter1);
+    loop.push_back(iter2);
   }
 
   // replace all loop cells with '*'
-  for(const auto& p : loop) data.pipes[p.i][p.j] = '*';
+  for (const auto &p : loop)
+    data.pipes[p.i][p.j] = '*';
 
-  int internal = 0;
-  // now, traverse the loop counterclockwise 
-  // maintain a vector that points orthogonally inward to the loop
-  // any cell that this orthogonal vector points towards that is
-  // not on the loop, is contained within the loop 
-  // count the area that is filled
-  for (size_t i = 0; i < data.pipes.size(); ++i)
+  for (const auto &row : data.pipes)
   {
-    for (size_t j = 0; j < data.pipes[0].size(); ++j)
-    {
-      floodfill({i, j}, data, loop);
-    }
+    std::cout << row << std::endl;
   }
+  int internal = 0;
+  // now, traverse the loop starting from the start position, with two iterators like we found the
+  // initial loop
+  // give each iterator an orthogonal direction to it's direction of travel
+  // one iteator (A) will start pointing in the direction the other iteror (B) started from S
+  // (B) will start pointing 180 degree oppositie the direction (A) took from S
+  size_t i = 1, j = 2;
+  iter1 = loop[i];
+  iter2 = loop[j];
+  Pos A = {iter2.i - loop[0].i, iter2.j - loop[0].j};
+  Pos B = {loop[0].i - iter1.i, loop[0].j - iter1.j};
+
+  while (iter1 != iter2)
+  {
+    floodfill(iter1 + A, data, 'A');
+    floodfill(iter2 + B, data, 'B');
+    i += 2;
+    j += 2;
+    iter1 = loop[i];
+    iter2 = loop[j];
+  }
+
+  std::cout << std::endl;
   for (const auto &row : data.pipes)
   {
     std::cout << row << std::endl;
@@ -227,14 +235,14 @@ Data parse()
   std::string line;
   Data data;
 
-  size_t i = 0;
+  long i = 0;
   while (std::getline(file, line))
   {
     data.pipes.push_back(line);
     auto it = line.find('S');
     if (it != std::string::npos)
     {
-      data.S = {i, it};
+      data.S = {i, long(it)};
     }
     ++i;
   }
