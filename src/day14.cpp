@@ -4,15 +4,15 @@
 #include <string>
 #include <vector>
 #include <benchmark/benchmark.h>
+#include <functional>
 
 struct Data
 {
   std::vector<std::string> rocks;
 };
 
-int part1(Data &data)
+void north(Data &data)
 {
-  int sum = 0;
   for (size_t j = 0; j < data.rocks[0].size(); ++j)
   {
     for (size_t i = 0; i < data.rocks.size() - 1; ++i)
@@ -20,42 +20,171 @@ int part1(Data &data)
       char c = data.rocks[i][j];
       if (c == '.')
       {
-        for (size_t k = i+1; k < data.rocks.size(); ++k)
+        for (size_t k = i + 1; k < data.rocks.size(); ++k)
         {
           char s = data.rocks[k][j];
-          if (s == 'O') {
+          if (s == 'O')
+          {
             data.rocks[i][j] = 'O';
             data.rocks[k][j] = '.';
             ++i;
           }
-          else if (s == '#') {
+          else if (s == '#')
+          {
             break;
           }
         }
       }
     }
   }
+}
 
-  for(size_t i = 0; i < data.rocks.size(); ++i) {
-    for(size_t j = 0; j < data.rocks[0].size(); ++j) {
-      if(data.rocks[i][j] == 'O') {
+void south(Data &data)
+{
+  for (size_t j = 0; j < data.rocks[0].size(); ++j)
+  {
+    for (int i = data.rocks.size() - 1; i >= 0; --i)
+    {
+      char c = data.rocks[i][j];
+      if (c == '.')
+      {
+        for (int k = i - 1; k >= 0; --k)
+        {
+          char s = data.rocks[k][j];
+          if (s == 'O')
+          {
+            data.rocks[i][j] = 'O';
+            data.rocks[k][j] = '.';
+            --i;
+          }
+          else if (s == '#')
+          {
+            break;
+          }
+        }
+      }
+    }
+  }
+}
+
+void west(Data &data)
+{
+  for (int i = 0; i < data.rocks.size(); ++i)
+  {
+    for (size_t j = 0; j < data.rocks[0].size(); ++j)
+    {
+      char c = data.rocks[i][j];
+      if (c == '.')
+      {
+        for (int k = j + 1; k < data.rocks[0].size(); ++k)
+        {
+          char s = data.rocks[i][k];
+          if (s == 'O')
+          {
+            data.rocks[i][j] = 'O';
+            data.rocks[i][k] = '.';
+            ++j;
+          }
+          else if (s == '#')
+          {
+            break;
+          }
+        }
+      }
+    }
+  }
+}
+
+void east(Data &data)
+{
+  for (int i = 0; i < data.rocks.size(); ++i)
+  {
+    for (int j = data.rocks[0].size() - 1; j >= 0; --j)
+    {
+      char c = data.rocks[i][j];
+      if (c == '.')
+      {
+        for (int k = j - 1; k >= 0; --k)
+        {
+          char s = data.rocks[i][k];
+          if (s == 'O')
+          {
+            data.rocks[i][j] = 'O';
+            data.rocks[i][k] = '.';
+            --j;
+          }
+          else if (s == '#')
+          {
+            break;
+          }
+        }
+      }
+    }
+  }
+}
+
+int count(const Data &data)
+{
+  int sum = 0;
+  for (size_t i = 0; i < data.rocks.size(); ++i)
+  {
+    for (size_t j = 0; j < data.rocks[0].size(); ++j)
+    {
+      if (data.rocks[i][j] == 'O')
+      {
         sum += data.rocks.size() - i;
       }
     }
   }
-
-
-  for (auto &line : data.rocks)
-  {
-    std::cout << line << std::endl;
-  }
-  std::cout << std::endl;
   return sum;
 }
 
-int part2(const Data &data)
+int part1(Data data)
 {
-  return 0;
+  north(data);
+  return count(data);
+}
+
+size_t hash(const std::vector<std::string> &strings)
+{
+  std::hash<std::string> hasher;
+
+  size_t combinedHash = 0;
+  for (const auto &str : strings)
+  {
+    combinedHash ^= hasher(str) + 0x9e3779b9 + (combinedHash << 6) + (combinedHash >> 2);
+  }
+
+  return combinedHash;
+}
+
+int part2(Data &data)
+{
+  std::vector<std::pair<size_t, int>> hashes;
+  int sum = 0;
+  size_t cycles = 1000000000;
+  for (size_t i = 0; i < cycles; ++i)
+  {
+    north(data);
+    west(data);
+    south(data);
+    east(data);
+    auto val = hash(data.rocks);
+    auto it = std::find_if(hashes.begin(), hashes.end(), [&val](const std::pair<size_t, int> &p)
+                           { return p.first == val; });
+    if (it != hashes.end())
+    {
+      auto tail = std::distance(hashes.begin(), it);
+      auto cycle = hashes.size() - tail;
+      auto final = (cycles - i) % cycle;
+      std::advance(it, final - 1);
+      return it->second;
+    }
+    else
+    {
+      hashes.push_back({val, count(data)});
+    }
+  }
 }
 
 Data parse()
@@ -107,8 +236,8 @@ int main(int argc, char **argv)
 {
   Data data = parse();
 
-  int answer1 = 1;
-  int answer2 = 0;
+  int answer1 = 109755;
+  int answer2 = 90928;
 
   auto first = part1(data);
   auto second = part2(data);
