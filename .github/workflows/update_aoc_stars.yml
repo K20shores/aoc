@@ -13,7 +13,7 @@ jobs:
           
       - uses: joblo2213/aoc-badges-action@v3
         with:
-          userid: k20shores
+          userid: 44566
           session: ${{ secrets.AOC_SESSION }}    # secret containing session code, see setup on how to obtain
           year: 2023
           
