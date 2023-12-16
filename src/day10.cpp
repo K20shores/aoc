@@ -169,6 +169,12 @@ int floodfill(const Pos &cur, Data &data, char fill_char = '0', char loop_char =
   return filled;
 }
 
+// thanks to https://www.reddit.com/r/adventofcode/comments/18f1sgh/comment/kcripvi/?utm_source=share&utm_medium=web2x&context=3
+enum Case {
+  In,
+  Out
+};
+
 int part2(Data data)
 {
   // get the path
@@ -191,34 +197,31 @@ int part2(Data data)
     loop.push_back(iter2);
   }
 
+  // sort the loop points so that as we iterate the lines to check for things inside,
+  // we can now what's a on the path or not
+  std::sort(loop.begin(), loop.end(), [](const auto& p1, const auto& p2) {
+    if (p1.i < p2.i) return true;
+    if (p1.i > p2.i) return true;
+    return p1.j < p2.j;
+  });
+
   // replace all loop cells with '*'
-  for (const auto &p : loop)
-    data.pipes[p.i][p.j] = '*';
+  // for (const auto &p : loo
+  //   data.pipes[p.i][p.j] = '*';
 
-  for (const auto &row : data.pipes)
-  {
-    std::cout << row << std::endl;
-  }
-  int internal = 0;
-  // now, traverse the loop starting from the start position, with two iterators like we found the
-  // initial loop
-  // give each iterator an orthogonal direction to it's direction of travel
-  // one iteator (A) will start pointing in the direction the other iteror (B) started from S
-  // (B) will start pointing 180 degree oppositie the direction (A) took from S
-  size_t i = 1, j = 2;
-  iter1 = loop[i];
-  iter2 = loop[j];
-  Pos A = {iter2.i - loop[0].i, iter2.j - loop[0].j};
-  Pos B = {loop[0].i - iter1.i, loop[0].j - iter1.j};
-
-  while (iter1 != iter2)
-  {
-    floodfill(iter1 + A, data, 'A');
-    floodfill(iter2 + B, data, 'B');
-    i += 2;
-    j += 2;
-    iter1 = loop[i];
-    iter2 = loop[j];
+  for(size_t i = 0; i < data.pipes.size(); ++i) {
+    Case region = Case::Out;
+    for(size_t j = 0; j < data.pipes[i].size(); ++j) {
+      char c = data.pipes[i][j];
+      switch (region) {
+        case Case::In: {
+          break;
+        }
+        case Case::Out: {
+          break;
+        }
+      }
+    }
   }
 
   std::cout << std::endl;
@@ -226,7 +229,7 @@ int part2(Data data)
   {
     std::cout << row << std::endl;
   }
-  return internal;
+  return 0;
 }
 
 Data parse()
