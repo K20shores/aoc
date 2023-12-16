@@ -1,0 +1,16 @@
+Language: Cpp
+BasedOnStyle: LLVM
+IndentWidth: 2
+UseTab: Never
+
+# Place opening braces on the same line
+BraceWrapping:
+  AfterControlStatement: false
+  SplitEmptyFunction: false
+  SplitEmptyRecord: false
+  SplitEmptyNamespace: false
+
+AllowShortIfStatementsOnASingleLine: true
+AllowShortLoopsOnASingleLine: true
+
+IndentCaseLabels: true
