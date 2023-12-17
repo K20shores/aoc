@@ -13,7 +13,9 @@ struct Data {
 
 std::pair<std::vector<std::vector<int>>, std::vector<std::vector<Pos>>> dijkstra(const Data& d) {
   std::vector<std::vector<int>> dist(d.grid.size(), std::vector<int>(d.grid[0].size(), std::numeric_limits<int>::infinity()));
-  std::vector<std::vector<Pos>> prev;
+  std::vector<std::vector<Pos>> prev(d.grid.size(), std::vector<Pos>(d.grid[0].size(), {-1, -1}));
+
+  return {dist, prev};
 }
 
 int part1(const Data &data)
