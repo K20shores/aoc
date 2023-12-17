@@ -11,43 +11,48 @@ struct Data {
   std::vector<std::vector<int>> broken_spirngs;
 };
 
-int arrangements(const std::string line, const std::vector<int> &springs) {
-  if (line.size() == 0 && springs.size() == 0) {
-    return 1;
-  } else if (line.size() == 0 && springs.size() == 0) {
-    return 0;
+std::map<std::string, int> tbl;
+
+int arrangements(const std::string line, const std::vector<int> &springs, size_t idx = 0) {
+  if (idx == line.size()) {
+    return springs.empty() ? 1 : 0;
   }
 
-  char c = line[0];
+  char c = line[idx];
   switch (c) {
     case '.': {
-      return arrangements(line.substr(1), springs);
+      return arrangements(line, springs, idx + 1);
     }
     case '#': {
-      if (springs[0] <= line.size()) {
+      if (springs.size() > 0 && idx + springs[0] <= line.size()) {
         for (size_t j = 0; j < springs[0]; ++j) {
-          if (line[j] == '.') {
-            return 0;
-          }
+          if (line[idx+j] == '.') return 0;
         }
-        if (springs[0] < line.size() && line[springs[0]] == '#') {
-          return 0;
+        if (line[idx+springs[0]] == '#') return 0;
+        if (line[idx+springs[0]] == '?'){
+          std::string dot = line;
+          dot[idx+springs[0]] = '.';
+          auto s = springs;
+          s.erase(s.begin());
+          return arrangements(dot, s, idx+springs[0]+1);
         }
-        auto s = springs;
-        s.erase(s.begin());
-        return arrangements(line.substr(springs[0]), s);
+        else {
+          auto s = springs;
+          s.erase(s.begin());
+          return arrangements(line, s, idx + springs[0]);
+        }
       } else {
         return 0;
       }
     }
     case '?': {
       std::string dot = line, hash = line;
-      dot[0] = '.';
-      hash[0] = '#';
-      return arrangements(dot, springs) + arrangements(hash, springs);
-      break;
+      dot[idx] = '.';
+      hash[idx] = '#';
+      return arrangements(dot, springs, idx) + arrangements(hash, springs, idx);
     }
   }
+  return 0;
 }
 
 int part1(const Data &data) {
@@ -123,7 +128,7 @@ BENCHMARK_REGISTER_F(BenchmarkFixture, Part2Benchmark);
 int main(int argc, char **argv) {
   Data data = parse();
 
-  int answer1 = 2;
+  int answer1 = 7670;
   int answer2 = 0;
 
   auto first = part1(data);
