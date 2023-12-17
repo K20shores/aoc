@@ -6,6 +6,7 @@
 #include <numeric>
 #include <string>
 #include <vector>
+#include <unordered_map>
 
 enum Rank { None, FiveOfAKind, FourOfAKind, FullHouse, ThreeOfAKind, TwoPair, OnePair, HighCard };
 

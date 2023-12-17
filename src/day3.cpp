@@ -3,6 +3,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <unordered_map>
 
 bool is_symbol(char c) { return !std::isdigit(c) && (c != '.'); }
 
