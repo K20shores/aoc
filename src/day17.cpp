@@ -5,14 +5,15 @@
 #include <vector>
 #include <benchmark/benchmark.h>
 #include <limits>
+#include <aoc2023/position.hpp>
 
 struct Data {
   std::vector<std::string> grid;
 };
 
-std::pair<std::vector<std::vector<int>>, std::vector<std::vector<int>>> dijkstra(const Data& d) {
+std::pair<std::vector<std::vector<int>>, std::vector<std::vector<Pos>>> dijkstra(const Data& d) {
   std::vector<std::vector<int>> dist(d.grid.size(), std::vector<int>(d.grid[0].size(), std::numeric_limits<int>::infinity()));
-  std::vector<std::vector<int>> dist(d.grid.size(), std::vector<int>(d.grid[0].size(), std::numeric_limits<int>::infinity()));
+  std::vector<std::vector<Pos>> prev;
 }
 
 int part1(const Data &data)
