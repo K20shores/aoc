@@ -38,8 +38,8 @@ jobs:
     steps:
       - name: Install Clang 16
         run: |
-          sudo apt-get update
-          sudo apt-get install -y clang-16
+          sudo apt update
+          sudo apt install -y clang-16
           sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-16 100
           sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-16 100
 
