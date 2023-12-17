@@ -8,20 +8,20 @@
 #include <vector>
 
 struct Mapping {
-  long src;
-  long dest;
-  long length;
+  int64_t src;
+  int64_t dest;
+  int64_t length;
 };
 
 struct Data {
-  std::vector<long> seeds;
+  std::vector<int64_t> seeds;
   std::vector<std::vector<Mapping>> ranges;
 };
 
-long part1(const Data &data) {
-  long min = std::numeric_limits<long>::max();
+int64_t part1(const Data &data) {
+  int64_t min = std::numeric_limits<int64_t>::max();
   for (const auto &seed : data.seeds) {
-    long location = seed;
+    int64_t location = seed;
     for (const auto &ranges : data.ranges) {
       for (const auto &range : ranges) {
         if (location >= range.src && location < range.src + range.length) {
@@ -39,12 +39,12 @@ long part1(const Data &data) {
 }
 
 int part2(const Data &data) {
-  long min = std::numeric_limits<long>::max();
+  int64_t min = std::numeric_limits<int64_t>::max();
   for (size_t i = 0; i < data.seeds.size(); i += 2) {
-    long start = data.seeds[i];
-    long n = data.seeds[i + 1];
-    for (long seed = start; seed < start + n; ++seed) {
-      long location = seed;
+    int64_t start = data.seeds[i];
+    int64_t n = data.seeds[i + 1];
+    for (int64_t seed = start; seed < start + n; ++seed) {
+      int64_t location = seed;
       for (const auto &ranges : data.ranges) {
         for (const auto &range : ranges) {
           if (location >= range.src && location < range.src + range.length) {
@@ -62,8 +62,8 @@ int part2(const Data &data) {
   return min;
 }
 
-std::vector<long> parse_numbers(const std::string &line) {
-  std::vector<long> numbers;
+std::vector<int64_t> parse_numbers(const std::string &line) {
+  std::vector<int64_t> numbers;
   size_t num_start = -1;
   for (size_t i = 0; i <= line.size(); ++i) {
     if (std::isdigit(line[i])) {
@@ -71,7 +71,7 @@ std::vector<long> parse_numbers(const std::string &line) {
         num_start = i;
       }
     } else if (num_start != -1) {
-      numbers.push_back(std::stol(line.substr(num_start, i - num_start)));
+      numbers.push_back(std::stoll(line.substr(num_start, i - num_start)));
       num_start = -1;
     }
   }

@@ -11,14 +11,14 @@ struct Data {
   std::vector<int> distance;
 };
 
-long long quad_solution(long long T, long long D) {
+int64_t quad_solution(int64_t T, int64_t D) {
   double disc = std::sqrt(T * T - 4 * D);
-  long long x = std::ceil((T - disc) / 2);
-  long long y = std::floor((T + disc) / 2);
+  int64_t x = std::ceil((T - disc) / 2);
+  int64_t y = std::floor((T + disc) / 2);
   return y - x + 1 - 2 * (T % 2 == 0);
 }
 
-long long part1(const Data &data) {
+int64_t part1(const Data &data) {
   long result = 1;
   for (size_t i = 0; i < data.times.size(); ++i) {
     result *= quad_solution(data.times[i], data.distance[i]);
@@ -26,7 +26,7 @@ long long part1(const Data &data) {
   return result;
 }
 
-long long part2(const Data &data) {
+int64_t part2(const Data &data) {
   std::string T = "";
   std::string D = "";
   for (size_t i = 0; i < data.times.size(); ++i) {
