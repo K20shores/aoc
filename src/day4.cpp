@@ -5,6 +5,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <cmath>
 
 int part1(const std::vector<std::pair<std::vector<int>, std::vector<int>>> &data) {
   int sum = 0;
