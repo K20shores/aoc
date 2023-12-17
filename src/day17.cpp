@@ -4,10 +4,15 @@
 #include <string>
 #include <vector>
 #include <benchmark/benchmark.h>
+#include <numeric_limits>
 
 struct Data {
-
+  std::vector<std::string> grid;
 };
+
+std::pair<std::vector<std::vector<int>>, std::vector<std::vector<int>>> dijkstra(const Data& d) {
+  std::vector<std::vector<int>> dist(d.grid.size(), std::vector<int>(d.grid[0].size(), std::numeric_limits<int>::infinity()));
+}
 
 int part1(const Data &data)
 {
@@ -27,6 +32,7 @@ Data parse()
 
   while (std::getline(file, line))
   {
+    data.grid.push_back(line);
   }
 
   return data;
