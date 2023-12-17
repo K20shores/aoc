@@ -4,6 +4,7 @@
 #include <fstream>
 #include <iostream>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 struct Data {
@@ -11,48 +12,60 @@ struct Data {
   std::vector<std::vector<int>> broken_spirngs;
 };
 
-std::map<std::string, int> tbl;
+std::unordered_map<std::string, long> tbl;
 
-int arrangements(const std::string line, const std::vector<int> &springs, size_t idx = 0) {
+long arrangements(const std::string line, const std::vector<int> &springs, size_t idx = 0) {
   if (idx == line.size()) {
     return springs.empty() ? 1 : 0;
   }
 
-  char c = line[idx];
-  switch (c) {
+  std::string springs_key = "";
+  for (auto &s : springs) springs_key += "|" + std::to_string(s);
+
+  std::string key = line.substr(idx) + "_" + std::to_string(idx) + "_" + springs_key;
+  auto it = tbl.find(key);
+  if (it != tbl.end()) {
+    return it->second;
+  }
+  long result = 0;
+
+  switch (line[idx]) {
     case '.': {
-      return arrangements(line, springs, idx + 1);
+      result = arrangements(line, springs, idx + 1);
+      break;
     }
     case '#': {
       if (springs.size() > 0 && idx + springs[0] <= line.size()) {
         for (size_t j = 0; j < springs[0]; ++j) {
-          if (line[idx+j] == '.') return 0;
+          if (line[idx + j] == '.') return 0;
         }
-        if (line[idx+springs[0]] == '#') return 0;
-        if (line[idx+springs[0]] == '?'){
+        if (line[idx + springs[0]] == '#') return 0;
+        if (line[idx + springs[0]] == '?') {
           std::string dot = line;
-          dot[idx+springs[0]] = '.';
+          dot[idx + springs[0]] = '.';
           auto s = springs;
           s.erase(s.begin());
-          return arrangements(dot, s, idx+springs[0]+1);
-        }
-        else {
+          result = arrangements(dot, s, idx + springs[0] + 1);
+        } else {
           auto s = springs;
           s.erase(s.begin());
-          return arrangements(line, s, idx + springs[0]);
+          result = arrangements(line, s, idx + springs[0]);
         }
       } else {
-        return 0;
+        result = 0;
       }
+      break;
     }
     case '?': {
       std::string dot = line, hash = line;
       dot[idx] = '.';
       hash[idx] = '#';
-      return arrangements(dot, springs, idx) + arrangements(hash, springs, idx);
+      result = arrangements(dot, springs, idx) + arrangements(hash, springs, idx);
+      break;
     }
   }
-  return 0;
+  tbl[key] = result;
+  return result;
 }
 
 int part1(const Data &data) {
@@ -67,7 +80,36 @@ int part1(const Data &data) {
   return sum;
 }
 
-int part2(const Data &data) { return 0; }
+std::string unfold_record(std::string record) {
+  std::string s = "";
+  for (size_t i = 0; i < 4; ++i) {
+    s += record + "?";
+  }
+  s += record;
+  return s;
+}
+
+std::vector<int> unfold_springs(std::vector<int> springs) {
+  std::vector<int> result;
+
+  for (int i = 0; i < 5; ++i) {
+    result.insert(result.end(), springs.begin(), springs.end());
+  }
+
+  return result;
+}
+
+long part2(const Data &data) {
+  long sum = 0;
+  auto record_it = data.record.begin();
+  auto springs_it = data.broken_spirngs.begin();
+  while (record_it != data.record.end()) {
+    sum += arrangements(unfold_record(*record_it), unfold_springs(*springs_it));
+    ++record_it;
+    ++springs_it;
+  }
+  return sum;
+}
 
 std::vector<int> parse_numbers(const std::string &line) {
   std::vector<int> numbers;
@@ -129,7 +171,7 @@ int main(int argc, char **argv) {
   Data data = parse();
 
   int answer1 = 7670;
-  int answer2 = 0;
+  long answer2 = 0;
 
   auto first = part1(data);
   auto second = part2(data);
