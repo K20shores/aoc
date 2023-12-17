@@ -1,14 +1,14 @@
-#include <iostream>
+#include <benchmark/benchmark.h>
 #include <filesystem>
 #include <fstream>
+#include <iostream>
 #include <string>
-#include <vector>
 #include <utility>
-#include <benchmark/benchmark.h>
+#include <vector>
 
-int part1(const std::vector<std::pair<std::vector<int>, std::vector<int>>>& data) {
+int part1(const std::vector<std::pair<std::vector<int>, std::vector<int>>> &data) {
   int sum = 0;
-  for(const auto& pair : data){
+  for (const auto &pair : data) {
     auto winning_nums = pair.first.begin();
     auto player_nums = pair.second.begin();
     int matches = 0;
@@ -21,8 +21,7 @@ int part1(const std::vector<std::pair<std::vector<int>, std::vector<int>>>& data
       }
       if (*winning_nums < *player_nums) {
         ++winning_nums;
-      }
-      else if (*player_nums < *winning_nums) {
+      } else if (*player_nums < *winning_nums) {
         ++player_nums;
       }
     }
@@ -31,11 +30,11 @@ int part1(const std::vector<std::pair<std::vector<int>, std::vector<int>>>& data
   return sum;
 }
 
-int part2(const std::vector<std::pair<std::vector<int>, std::vector<int>>>& data) {
+int part2(const std::vector<std::pair<std::vector<int>, std::vector<int>>> &data) {
   std::vector<int> copies(data.size(), 1);
   int sum = 0;
-  for(size_t i = 0; i < data.size(); ++i){
-    const auto& pair = data[i];
+  for (size_t i = 0; i < data.size(); ++i) {
+    const auto &pair = data[i];
     auto winning_nums = pair.first.begin();
     auto player_nums = pair.second.begin();
     int matches = 0;
@@ -48,12 +47,11 @@ int part2(const std::vector<std::pair<std::vector<int>, std::vector<int>>>& data
       }
       if (*winning_nums < *player_nums) {
         ++winning_nums;
-      }
-      else if (*player_nums < *winning_nums) {
+      } else if (*player_nums < *winning_nums) {
         ++player_nums;
       }
     }
-    for(size_t j = i+1; j <= i+matches; ++j) {
+    for (size_t j = i + 1; j <= i + matches; ++j) {
       copies[j] += copies[i];
     }
     sum += copies[i];
@@ -61,35 +59,29 @@ int part2(const std::vector<std::pair<std::vector<int>, std::vector<int>>>& data
   return sum;
 }
 
-std::vector<std::pair<std::vector<int>, std::vector<int>>> parse()
-{
+std::vector<std::pair<std::vector<int>, std::vector<int>>> parse() {
   std::ifstream file(std::filesystem::path("inputs/day4.txt"));
   std::string line;
   std::vector<std::pair<std::vector<int>, std::vector<int>>> data;
 
-  while (std::getline(file, line))
-  {
+  while (std::getline(file, line)) {
     std::pair<std::vector<int>, std::vector<int>> row;
     bool winning = true, collect = false;
     size_t length = 0;
     size_t num = 0;
-    for(size_t i = 0; i <= line.size(); ++i) {
+    for (size_t i = 0; i <= line.size(); ++i) {
       char c = line[i];
       if (c == '|') {
         winning = false;
-      }
-      else if (c == ':') {
+      } else if (c == ':') {
         collect = true;
-      }
-      else if (collect && std::isdigit(c)) {
+      } else if (collect && std::isdigit(c)) {
         num = num * std::pow(10, length) + (c - '0');
         ++length;
-      }
-      else if (num != 0) {
+      } else if (num != 0) {
         if (winning) {
           row.first.push_back(num);
-        }
-        else {
+        } else {
           row.second.push_back(num);
         }
         length = 0;
@@ -105,29 +97,29 @@ std::vector<std::pair<std::vector<int>, std::vector<int>>> parse()
 
 class BenchmarkFixture : public benchmark::Fixture {
 public:
-    static std::vector<std::pair<std::vector<int>, std::vector<int>>> data;
+  static std::vector<std::pair<std::vector<int>, std::vector<int>>> data;
 };
 
 std::vector<std::pair<std::vector<int>, std::vector<int>>> BenchmarkFixture::data = parse();
 
-BENCHMARK_DEFINE_F(BenchmarkFixture, Part1Benchmark)(benchmark::State& state) {
-    for (auto _ : state) {
-        int sum = part1(data);
-        benchmark::DoNotOptimize(sum);
-    }
+BENCHMARK_DEFINE_F(BenchmarkFixture, Part1Benchmark)(benchmark::State &state) {
+  for (auto _ : state) {
+    int sum = part1(data);
+    benchmark::DoNotOptimize(sum);
+  }
 }
 
-BENCHMARK_DEFINE_F(BenchmarkFixture, Part2Benchmark)(benchmark::State& state) {
-    for (auto _ : state) {
-        int sum = part2(data);
-        benchmark::DoNotOptimize(sum);
-    }
+BENCHMARK_DEFINE_F(BenchmarkFixture, Part2Benchmark)(benchmark::State &state) {
+  for (auto _ : state) {
+    int sum = part2(data);
+    benchmark::DoNotOptimize(sum);
+  }
 }
 
 BENCHMARK_REGISTER_F(BenchmarkFixture, Part1Benchmark);
 BENCHMARK_REGISTER_F(BenchmarkFixture, Part2Benchmark);
 
-int main(int argc, char** argv) {
+int main(int argc, char **argv) {
   std::vector<std::pair<std::vector<int>, std::vector<int>>> data = parse();
 
   int part1_sum = part1(data);

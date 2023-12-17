@@ -14,3 +14,5 @@ AllowShortIfStatementsOnASingleLine: true
 AllowShortLoopsOnASingleLine: true
 
 IndentCaseLabels: true
+
+ColumnLimit: 160

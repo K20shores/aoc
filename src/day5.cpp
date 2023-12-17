@@ -1,42 +1,34 @@
-#include <iostream>
+#include <benchmark/benchmark.h>
 #include <filesystem>
 #include <fstream>
-#include <string>
-#include <vector>
-#include <utility>
+#include <iostream>
 #include <numeric>
-#include <benchmark/benchmark.h>
+#include <string>
+#include <utility>
+#include <vector>
 
-struct Mapping
-{
+struct Mapping {
   long src;
   long dest;
   long length;
 };
 
-struct Data
-{
+struct Data {
   std::vector<long> seeds;
   std::vector<std::vector<Mapping>> ranges;
 };
 
-long part1(const Data &data)
-{
+long part1(const Data &data) {
   long min = LONG_MAX;
-  for (const auto &seed : data.seeds)
-  {
+  for (const auto &seed : data.seeds) {
     long location = seed;
-    for (const auto &ranges : data.ranges)
-    {
-      for (const auto &range : ranges)
-      {
-        if (location >= range.src && location < range.src + range.length)
-        {
+    for (const auto &ranges : data.ranges) {
+      for (const auto &range : ranges) {
+        if (location >= range.src && location < range.src + range.length) {
           location = (location - range.src) + range.dest;
           break;
         }
-        if (location < range.src)
-        {
+        if (location < range.src) {
           break;
         }
       }
@@ -46,27 +38,20 @@ long part1(const Data &data)
   return min;
 }
 
-int part2(const Data &data)
-{
+int part2(const Data &data) {
   long min = LONG_MAX;
-  for (size_t i = 0; i < data.seeds.size(); i += 2)
-  {
+  for (size_t i = 0; i < data.seeds.size(); i += 2) {
     long start = data.seeds[i];
     long n = data.seeds[i + 1];
-    for (long seed = start; seed < start + n; ++seed)
-    {
+    for (long seed = start; seed < start + n; ++seed) {
       long location = seed;
-      for (const auto &ranges : data.ranges)
-      {
-        for (const auto &range : ranges)
-        {
-          if (location >= range.src && location < range.src + range.length)
-          {
+      for (const auto &ranges : data.ranges) {
+        for (const auto &range : ranges) {
+          if (location >= range.src && location < range.src + range.length) {
             location = (location - range.src) + range.dest;
             break;
           }
-          if (location < range.src)
-          {
+          if (location < range.src) {
             break;
           }
         }
@@ -77,21 +62,15 @@ int part2(const Data &data)
   return min;
 }
 
-std::vector<long> parse_numbers(const std::string &line)
-{
+std::vector<long> parse_numbers(const std::string &line) {
   std::vector<long> numbers;
   size_t num_start = -1;
-  for (size_t i = 0; i <= line.size(); ++i)
-  {
-    if (std::isdigit(line[i]))
-    {
-      if (num_start == -1)
-      {
+  for (size_t i = 0; i <= line.size(); ++i) {
+    if (std::isdigit(line[i])) {
+      if (num_start == -1) {
         num_start = i;
       }
-    }
-    else if (num_start != -1)
-    {
+    } else if (num_start != -1) {
       numbers.push_back(std::stol(line.substr(num_start, i - num_start)));
       num_start = -1;
     }
@@ -99,56 +78,41 @@ std::vector<long> parse_numbers(const std::string &line)
   return numbers;
 }
 
-bool compare_mappings(const Mapping &a, const Mapping &b)
-{
-  return a.src < b.src;
-}
+bool compare_mappings(const Mapping &a, const Mapping &b) { return a.src < b.src; }
 
-Data parse()
-{
+Data parse() {
   std::ifstream file(std::filesystem::path("inputs/day5.txt"));
   std::string line;
   Data data;
 
   std::vector<Mapping> ranges;
-  while (std::getline(file, line))
-  {
-    if (line.starts_with("seeds:"))
-    {
+  while (std::getline(file, line)) {
+    if (line.starts_with("seeds:")) {
       data.seeds = parse_numbers(line);
-    }
-    else
-    {
-      if (line.find("-to-") != std::string::npos)
-      {
-        if (ranges.size() > 0)
-        {
+    } else {
+      if (line.find("-to-") != std::string::npos) {
+        if (ranges.size() > 0) {
           data.ranges.push_back(ranges);
           ranges.clear();
         }
-      }
-      else if (std::isdigit(line[0]))
-      {
+      } else if (std::isdigit(line[0])) {
         auto numbers = parse_numbers(line);
         ranges.push_back({.src = numbers[1], .dest = numbers[0], .length = numbers[2]});
       }
     }
   }
-  if (ranges.size() > 0)
-  {
+  if (ranges.size() > 0) {
     data.ranges.push_back(ranges);
   }
 
-  for (auto &range : data.ranges)
-  {
+  for (auto &range : data.ranges) {
     std::sort(range.begin(), range.end(), compare_mappings);
   }
 
   return data;
 }
 
-class BenchmarkFixture : public benchmark::Fixture
-{
+class BenchmarkFixture : public benchmark::Fixture {
 public:
   static Data data;
 };
@@ -156,20 +120,16 @@ public:
 Data BenchmarkFixture::data = parse();
 
 BENCHMARK_DEFINE_F(BenchmarkFixture, Part1Benchmark)
-(benchmark::State &state)
-{
-  for (auto _ : state)
-  {
+(benchmark::State &state) {
+  for (auto _ : state) {
     int s = part1(data);
     benchmark::DoNotOptimize(s);
   }
 }
 
 BENCHMARK_DEFINE_F(BenchmarkFixture, Part2Benchmark)
-(benchmark::State &state)
-{
-  for (auto _ : state)
-  {
+(benchmark::State &state) {
+  for (auto _ : state) {
     int s = part2(data);
     benchmark::DoNotOptimize(s);
   }
@@ -178,8 +138,7 @@ BENCHMARK_DEFINE_F(BenchmarkFixture, Part2Benchmark)
 BENCHMARK_REGISTER_F(BenchmarkFixture, Part1Benchmark);
 BENCHMARK_REGISTER_F(BenchmarkFixture, Part2Benchmark);
 
-int main(int argc, char **argv)
-{
+int main(int argc, char **argv) {
   Data data = parse();
 
   std::cout << "Part 1: " << part1(data) << std::endl;

@@ -1,64 +1,49 @@
-#include <iostream>
+#include <aoc2023/position.hpp>
+#include <benchmark/benchmark.h>
+#include <cmath>
 #include <filesystem>
 #include <fstream>
+#include <iostream>
 #include <string>
 #include <vector>
-#include <cmath>
-#include <benchmark/benchmark.h>
-#include <aoc2023/position.hpp>
 
-struct Data
-{
+struct Data {
   std::vector<std::string> lines;
 };
 
-int part1(const Data &data)
-{
+int part1(const Data &data) {
   std::vector<size_t> empty_rows;
   std::vector<size_t> empty_columns;
   std::vector<Pos> positions;
 
-  for (long i = 0; i < data.lines.size(); ++i)
-  {
+  for (long i = 0; i < data.lines.size(); ++i) {
     bool found = false;
-    for (long j = 0; j < data.lines[i].size(); ++j)
-    {
-      if (data.lines[i][j] == '#')
-      {
+    for (long j = 0; j < data.lines[i].size(); ++j) {
+      if (data.lines[i][j] == '#') {
         positions.push_back({i, j});
         found = true;
       }
     }
-    if (!found)
-    {
+    if (!found) {
       empty_rows.push_back(i);
     }
   }
-  for (size_t j = 0; j < data.lines[0].size(); ++j)
-  {
-    for (size_t i = 0; i < data.lines.size(); ++i)
-    {
-      if (data.lines[i][j] == '#')
-        break;
-      if (i == data.lines.size() - 1 && data.lines[i][j] == '.')
-        empty_columns.push_back(j);
+  for (size_t j = 0; j < data.lines[0].size(); ++j) {
+    for (size_t i = 0; i < data.lines.size(); ++i) {
+      if (data.lines[i][j] == '#') break;
+      if (i == data.lines.size() - 1 && data.lines[i][j] == '.') empty_columns.push_back(j);
     }
   }
 
-  for (auto &pos : positions)
-  {
+  for (auto &pos : positions) {
     size_t i = 0, j = 0;
-    for (const auto &row : empty_rows)
-    {
-      if (row <= pos.i)
-      {
+    for (const auto &row : empty_rows) {
+      if (row <= pos.i) {
         ++i;
       }
     }
-    for (const auto &column : empty_columns)
-    {
-      if (column <= pos.j)
-      {
+    for (const auto &column : empty_columns) {
+      if (column <= pos.j) {
         ++j;
       }
     }
@@ -67,11 +52,9 @@ int part1(const Data &data)
   }
 
   int s = 0;
-  for (size_t i = 0; i < positions.size() - 1; ++i)
-  {
+  for (size_t i = 0; i < positions.size() - 1; ++i) {
     auto p1 = positions[i];
-    for (size_t j = i + 1; j < positions.size(); ++j)
-    {
+    for (size_t j = i + 1; j < positions.size(); ++j) {
       auto p2 = positions[j];
       s += std::abs(int(p1.i - p2.i)) + std::abs(int(p1.j - p2.j));
     }
@@ -79,66 +62,50 @@ int part1(const Data &data)
   return s;
 }
 
-long part2(const Data &data)
-{
+long part2(const Data &data) {
   std::vector<size_t> empty_rows;
   std::vector<size_t> empty_columns;
   std::vector<Pos> positions;
 
-  for (long i = 0; i < data.lines.size(); ++i)
-  {
+  for (long i = 0; i < data.lines.size(); ++i) {
     bool found = false;
-    for (long j = 0; j < data.lines[i].size(); ++j)
-    {
-      if (data.lines[i][j] == '#')
-      {
+    for (long j = 0; j < data.lines[i].size(); ++j) {
+      if (data.lines[i][j] == '#') {
         positions.push_back({i, j});
         found = true;
       }
     }
-    if (!found)
-    {
+    if (!found) {
       empty_rows.push_back(i);
     }
   }
-  for (size_t j = 0; j < data.lines[0].size(); ++j)
-  {
-    for (size_t i = 0; i < data.lines.size(); ++i)
-    {
-      if (data.lines[i][j] == '#')
-        break;
-      if (i == data.lines.size() - 1 && data.lines[i][j] == '.')
-        empty_columns.push_back(j);
+  for (size_t j = 0; j < data.lines[0].size(); ++j) {
+    for (size_t i = 0; i < data.lines.size(); ++i) {
+      if (data.lines[i][j] == '#') break;
+      if (i == data.lines.size() - 1 && data.lines[i][j] == '.') empty_columns.push_back(j);
     }
   }
 
-  for (auto &pos : positions)
-  {
+  for (auto &pos : positions) {
     size_t i = 0, j = 0;
-    for (const auto &row : empty_rows)
-    {
-      if (row <= pos.i)
-      {
+    for (const auto &row : empty_rows) {
+      if (row <= pos.i) {
         ++i;
       }
     }
-    for (const auto &column : empty_columns)
-    {
-      if (column <= pos.j)
-      {
+    for (const auto &column : empty_columns) {
+      if (column <= pos.j) {
         ++j;
       }
     }
-    pos.i += (1e6-1) * i;
-    pos.j += (1e6-1) * j;
+    pos.i += (1e6 - 1) * i;
+    pos.j += (1e6 - 1) * j;
   }
 
   long s = 0;
-  for (size_t i = 0; i < positions.size() - 1; ++i)
-  {
+  for (size_t i = 0; i < positions.size() - 1; ++i) {
     auto p1 = positions[i];
-    for (size_t j = i + 1; j < positions.size(); ++j)
-    {
+    for (size_t j = i + 1; j < positions.size(); ++j) {
       auto p2 = positions[j];
       s += std::abs(long(p1.i - p2.i)) + std::abs(long(p1.j - p2.j));
     }
@@ -146,22 +113,19 @@ long part2(const Data &data)
   return s;
 }
 
-Data parse()
-{
+Data parse() {
   std::ifstream file(std::filesystem::path("inputs/day11.txt"));
   std::string line;
   Data data;
 
-  while (std::getline(file, line))
-  {
+  while (std::getline(file, line)) {
     data.lines.push_back(line);
   }
 
   return data;
 }
 
-class BenchmarkFixture : public benchmark::Fixture
-{
+class BenchmarkFixture : public benchmark::Fixture {
 public:
   static Data data;
 };
@@ -169,20 +133,16 @@ public:
 Data BenchmarkFixture::data = parse();
 
 BENCHMARK_DEFINE_F(BenchmarkFixture, Part1Benchmark)
-(benchmark::State &state)
-{
-  for (auto _ : state)
-  {
+(benchmark::State &state) {
+  for (auto _ : state) {
     int s = part1(data);
     benchmark::DoNotOptimize(s);
   }
 }
 
 BENCHMARK_DEFINE_F(BenchmarkFixture, Part2Benchmark)
-(benchmark::State &state)
-{
-  for (auto _ : state)
-  {
+(benchmark::State &state) {
+  for (auto _ : state) {
     int s = part2(data);
     benchmark::DoNotOptimize(s);
   }
@@ -191,8 +151,7 @@ BENCHMARK_DEFINE_F(BenchmarkFixture, Part2Benchmark)
 BENCHMARK_REGISTER_F(BenchmarkFixture, Part1Benchmark);
 BENCHMARK_REGISTER_F(BenchmarkFixture, Part2Benchmark);
 
-int main(int argc, char **argv)
-{
+int main(int argc, char **argv) {
   Data data = parse();
 
   long answer1 = 9521776;

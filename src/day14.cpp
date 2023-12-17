@@ -1,36 +1,27 @@
-#include <iostream>
+#include <benchmark/benchmark.h>
 #include <filesystem>
 #include <fstream>
+#include <functional>
+#include <iostream>
 #include <string>
 #include <vector>
-#include <benchmark/benchmark.h>
-#include <functional>
 
-struct Data
-{
+struct Data {
   std::vector<std::string> rocks;
 };
 
-void north(Data &data)
-{
-  for (size_t j = 0; j < data.rocks[0].size(); ++j)
-  {
-    for (size_t i = 0; i < data.rocks.size() - 1; ++i)
-    {
+void north(Data &data) {
+  for (size_t j = 0; j < data.rocks[0].size(); ++j) {
+    for (size_t i = 0; i < data.rocks.size() - 1; ++i) {
       char c = data.rocks[i][j];
-      if (c == '.')
-      {
-        for (size_t k = i + 1; k < data.rocks.size(); ++k)
-        {
+      if (c == '.') {
+        for (size_t k = i + 1; k < data.rocks.size(); ++k) {
           char s = data.rocks[k][j];
-          if (s == 'O')
-          {
+          if (s == 'O') {
             data.rocks[i][j] = 'O';
             data.rocks[k][j] = '.';
             ++i;
-          }
-          else if (s == '#')
-          {
+          } else if (s == '#') {
             break;
           }
         }
@@ -39,26 +30,18 @@ void north(Data &data)
   }
 }
 
-void south(Data &data)
-{
-  for (size_t j = 0; j < data.rocks[0].size(); ++j)
-  {
-    for (int i = data.rocks.size() - 1; i >= 0; --i)
-    {
+void south(Data &data) {
+  for (size_t j = 0; j < data.rocks[0].size(); ++j) {
+    for (int i = data.rocks.size() - 1; i >= 0; --i) {
       char c = data.rocks[i][j];
-      if (c == '.')
-      {
-        for (int k = i - 1; k >= 0; --k)
-        {
+      if (c == '.') {
+        for (int k = i - 1; k >= 0; --k) {
           char s = data.rocks[k][j];
-          if (s == 'O')
-          {
+          if (s == 'O') {
             data.rocks[i][j] = 'O';
             data.rocks[k][j] = '.';
             --i;
-          }
-          else if (s == '#')
-          {
+          } else if (s == '#') {
             break;
           }
         }
@@ -67,26 +50,18 @@ void south(Data &data)
   }
 }
 
-void west(Data &data)
-{
-  for (int i = 0; i < data.rocks.size(); ++i)
-  {
-    for (size_t j = 0; j < data.rocks[0].size(); ++j)
-    {
+void west(Data &data) {
+  for (int i = 0; i < data.rocks.size(); ++i) {
+    for (size_t j = 0; j < data.rocks[0].size(); ++j) {
       char c = data.rocks[i][j];
-      if (c == '.')
-      {
-        for (int k = j + 1; k < data.rocks[0].size(); ++k)
-        {
+      if (c == '.') {
+        for (int k = j + 1; k < data.rocks[0].size(); ++k) {
           char s = data.rocks[i][k];
-          if (s == 'O')
-          {
+          if (s == 'O') {
             data.rocks[i][j] = 'O';
             data.rocks[i][k] = '.';
             ++j;
-          }
-          else if (s == '#')
-          {
+          } else if (s == '#') {
             break;
           }
         }
@@ -95,26 +70,18 @@ void west(Data &data)
   }
 }
 
-void east(Data &data)
-{
-  for (int i = 0; i < data.rocks.size(); ++i)
-  {
-    for (int j = data.rocks[0].size() - 1; j >= 0; --j)
-    {
+void east(Data &data) {
+  for (int i = 0; i < data.rocks.size(); ++i) {
+    for (int j = data.rocks[0].size() - 1; j >= 0; --j) {
       char c = data.rocks[i][j];
-      if (c == '.')
-      {
-        for (int k = j - 1; k >= 0; --k)
-        {
+      if (c == '.') {
+        for (int k = j - 1; k >= 0; --k) {
           char s = data.rocks[i][k];
-          if (s == 'O')
-          {
+          if (s == 'O') {
             data.rocks[i][j] = 'O';
             data.rocks[i][k] = '.';
             --j;
-          }
-          else if (s == '#')
-          {
+          } else if (s == '#') {
             break;
           }
         }
@@ -123,15 +90,11 @@ void east(Data &data)
   }
 }
 
-int count(const Data &data)
-{
+int count(const Data &data) {
   int sum = 0;
-  for (size_t i = 0; i < data.rocks.size(); ++i)
-  {
-    for (size_t j = 0; j < data.rocks[0].size(); ++j)
-    {
-      if (data.rocks[i][j] == 'O')
-      {
+  for (size_t i = 0; i < data.rocks.size(); ++i) {
+    for (size_t j = 0; j < data.rocks[0].size(); ++j) {
+      if (data.rocks[i][j] == 'O') {
         sum += data.rocks.size() - i;
       }
     }
@@ -139,70 +102,58 @@ int count(const Data &data)
   return sum;
 }
 
-int part1(Data data)
-{
+int part1(Data data) {
   north(data);
   return count(data);
 }
 
-size_t hash(const std::vector<std::string> &strings)
-{
+size_t hash(const std::vector<std::string> &strings) {
   std::hash<std::string> hasher;
 
   size_t combinedHash = 0;
-  for (const auto &str : strings)
-  {
+  for (const auto &str : strings) {
     combinedHash ^= hasher(str) + 0x9e3779b9 + (combinedHash << 6) + (combinedHash >> 2);
   }
 
   return combinedHash;
 }
 
-int part2(Data &data)
-{
+int part2(Data &data) {
   std::vector<std::pair<size_t, int>> hashes;
   int sum = 0;
   size_t cycles = 1000000000;
-  for (size_t i = 0; i < cycles; ++i)
-  {
+  for (size_t i = 0; i < cycles; ++i) {
     north(data);
     west(data);
     south(data);
     east(data);
     auto val = hash(data.rocks);
-    auto it = std::find_if(hashes.begin(), hashes.end(), [&val](const std::pair<size_t, int> &p)
-                           { return p.first == val; });
-    if (it != hashes.end())
-    {
+    auto it = std::find_if(hashes.begin(), hashes.end(), [&val](const std::pair<size_t, int> &p) { return p.first == val; });
+    if (it != hashes.end()) {
       auto tail = std::distance(hashes.begin(), it);
       auto cycle = hashes.size() - tail;
       auto final = (cycles - i) % cycle;
       std::advance(it, final - 1);
       return it->second;
-    }
-    else
-    {
+    } else {
       hashes.push_back({val, count(data)});
     }
   }
 }
 
-Data parse()
-{
+Data parse() {
   std::ifstream file(std::filesystem::path("inputs/day14.txt"));
   std::string line;
   Data data;
 
-  while (std::getline(file, line))
-  {
+  while (std::getline(file, line)) {
     data.rocks.push_back(line);
   }
 
   return data;
 }
 
-class BenchmarkFixture : public benchmark::Fixture
-{
+class BenchmarkFixture : public benchmark::Fixture {
 public:
   static Data data;
 };
@@ -210,20 +161,16 @@ public:
 Data BenchmarkFixture::data = parse();
 
 BENCHMARK_DEFINE_F(BenchmarkFixture, Part1Benchmark)
-(benchmark::State &state)
-{
-  for (auto _ : state)
-  {
+(benchmark::State &state) {
+  for (auto _ : state) {
     int s = part1(data);
     benchmark::DoNotOptimize(s);
   }
 }
 
 BENCHMARK_DEFINE_F(BenchmarkFixture, Part2Benchmark)
-(benchmark::State &state)
-{
-  for (auto _ : state)
-  {
+(benchmark::State &state) {
+  for (auto _ : state) {
     int s = part2(data);
     benchmark::DoNotOptimize(s);
   }
@@ -232,8 +179,7 @@ BENCHMARK_DEFINE_F(BenchmarkFixture, Part2Benchmark)
 BENCHMARK_REGISTER_F(BenchmarkFixture, Part1Benchmark);
 BENCHMARK_REGISTER_F(BenchmarkFixture, Part2Benchmark);
 
-int main(int argc, char **argv)
-{
+int main(int argc, char **argv) {
   Data data = parse();
 
   int answer1 = 109755;
