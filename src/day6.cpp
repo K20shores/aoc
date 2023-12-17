@@ -11,14 +11,14 @@ struct Data {
   std::vector<int> distance;
 };
 
-long quad_solution(long T, long D) {
+long long quad_solution(long long T, long long D) {
   double disc = std::sqrt(T * T - 4 * D);
-  long x = std::ceil((T - disc) / 2);
-  long y = std::floor((T + disc) / 2);
+  long long x = std::ceil((T - disc) / 2);
+  long long y = std::floor((T + disc) / 2);
   return y - x + 1 - 2 * (T % 2 == 0);
 }
 
-long part1(const Data &data) {
+long long part1(const Data &data) {
   long result = 1;
   for (size_t i = 0; i < data.times.size(); ++i) {
     result *= quad_solution(data.times[i], data.distance[i]);
@@ -26,7 +26,7 @@ long part1(const Data &data) {
   return result;
 }
 
-long part2(const Data &data) {
+long long part2(const Data &data) {
   std::string T = "";
   std::string D = "";
   for (size_t i = 0; i < data.times.size(); ++i) {
@@ -34,7 +34,7 @@ long part2(const Data &data) {
     D += std::to_string(data.distance[i]);
   }
 
-  return quad_solution(std::stol(T), std::stol(D));
+  return quad_solution(std::stoll(T), std::stoll(D));
 }
 
 std::vector<int> parse_numbers(const std::string &line) {
@@ -55,6 +55,10 @@ std::vector<int> parse_numbers(const std::string &line) {
 
 Data parse() {
   std::ifstream file(std::filesystem::path("inputs/day6.txt"));
+  if (!file) {
+    std::cout << "Current Working Directory: " << std::filesystem::current_path() << std::endl;
+    throw std::runtime_error("Bad file read");
+  }
   std::string line;
   Data data;
 

@@ -6,6 +6,7 @@
 #include <benchmark/benchmark.h>
 #include <limits>
 #include <aoc2023/position.hpp>
+#include <queue>
 
 struct Data {
   std::vector<std::string> grid;
@@ -14,6 +15,18 @@ struct Data {
 std::pair<std::vector<std::vector<int>>, std::vector<std::vector<Pos>>> dijkstra(const Data& d) {
   std::vector<std::vector<int>> dist(d.grid.size(), std::vector<int>(d.grid[0].size(), std::numeric_limits<int>::infinity()));
   std::vector<std::vector<Pos>> prev(d.grid.size(), std::vector<Pos>(d.grid[0].size(), {-1, -1}));
+  std::queue<Pos> set;
+
+  for(long i = 0; i < d.grid.size(); ++i) {
+    for(long j = 0; j < d.grid[0].size(); ++j) {
+      set.push({i, j});
+    }
+  }
+
+  while (!set.empty()) {
+
+  }
+
 
   return {dist, prev};
 }
