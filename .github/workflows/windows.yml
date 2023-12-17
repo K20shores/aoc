@@ -24,5 +24,7 @@ jobs:
       if: matrix.build_type == 'Debug'
     - name: Build
       run: cmake --build build --config ${{ matrix.build_type }} --parallel 10
-    - name: Test
-      run: cd build ; ctest -C ${{ matrix.build_type }} --output-on-failure
+    - name: Run tests
+      run: |
+        cd build
+        ctest -C ${{ matrix.build_type }} --rerun-failed --output-on-failure . --verbose
