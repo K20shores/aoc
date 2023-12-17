@@ -93,10 +93,3 @@ long n_choose_k(long n, long k)
   }
   return result;
 }
-
-long n_permute_k(long n, long k) {
-  long result = 1;
-  for(size_t i = 0; i <= k; ++i) {
-    result *= (n - i);
-  }
-}

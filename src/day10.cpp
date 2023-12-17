@@ -13,9 +13,7 @@ struct Data {
 };
 
 char get_char(const std::vector<std::string> &data, Pos cur) {
-  if (cur.i >= 0 && cur.i < data.size() && cur.j >= 0 &&
-      cur.j < data[cur.i].size())
-    return data[cur.i][cur.j];
+  if (cur.i >= 0 && cur.i < data.size() && cur.j >= 0 && cur.j < data[cur.i].size()) return data[cur.i][cur.j];
   return '\0';
 }
 
@@ -38,48 +36,33 @@ std::vector<Pos> connected_pipes(const Pos &cur, const Data &data) {
   switch (curc) {
     case 'S':
       if (upc == '7' || upc == 'F' || upc == '|') connected.push_back(up);
-      if (downc == 'L' || downc == 'J' || downc == '|')
-        connected.push_back(down);
-      if (leftc == 'L' || leftc == 'F' || leftc == '-')
-        connected.push_back(left);
-      if (rightc == '7' || rightc == 'J' || rightc == '-')
-        connected.push_back(right);
+      if (downc == 'L' || downc == 'J' || downc == '|') connected.push_back(down);
+      if (leftc == 'L' || leftc == 'F' || leftc == '-') connected.push_back(left);
+      if (rightc == '7' || rightc == 'J' || rightc == '-') connected.push_back(right);
       break;
     case '|': // is a vertical pipe connecting north and south.
-      if (upc == '7' || upc == 'F' || upc == '|' || upc == 'S')
-        connected.push_back(up);
-      if (downc == 'L' || downc == 'J' || downc == '|' || downc == 'S')
-        connected.push_back(down);
+      if (upc == '7' || upc == 'F' || upc == '|' || upc == 'S') connected.push_back(up);
+      if (downc == 'L' || downc == 'J' || downc == '|' || downc == 'S') connected.push_back(down);
       break;
     case '-': // is a horizontal pipe connecting east and west.
-      if (leftc == 'L' || leftc == 'F' || leftc == '-' || leftc == 'S')
-        connected.push_back(left);
-      if (rightc == '7' || rightc == 'J' || rightc == '-' || rightc == 'S')
-        connected.push_back(right);
+      if (leftc == 'L' || leftc == 'F' || leftc == '-' || leftc == 'S') connected.push_back(left);
+      if (rightc == '7' || rightc == 'J' || rightc == '-' || rightc == 'S') connected.push_back(right);
       break;
     case 'L': // is a 90-degree bend connecting north and east.
-      if (upc == '|' || upc == '7' || upc == 'F' || upc == 'S')
-        connected.push_back(up);
-      if (rightc == '7' || rightc == 'J' || rightc == '-' || rightc == 'S')
-        connected.push_back(right);
+      if (upc == '|' || upc == '7' || upc == 'F' || upc == 'S') connected.push_back(up);
+      if (rightc == '7' || rightc == 'J' || rightc == '-' || rightc == 'S') connected.push_back(right);
       break;
     case 'J': // is a 90-degree bend connecting north and west.
-      if (upc == '|' || upc == '7' || upc == 'F' || upc == 'S')
-        connected.push_back(up);
-      if (leftc == 'F' || leftc == '-' || leftc == 'L' || leftc == 'S')
-        connected.push_back(left);
+      if (upc == '|' || upc == '7' || upc == 'F' || upc == 'S') connected.push_back(up);
+      if (leftc == 'F' || leftc == '-' || leftc == 'L' || leftc == 'S') connected.push_back(left);
       break;
     case '7': // is a 90-degree bend connecting south and west.
-      if (downc == '|' || downc == 'L' || downc == 'J' || downc == 'S')
-        connected.push_back(down);
-      if (leftc == 'F' || leftc == '-' || leftc == 'L' || leftc == 'S')
-        connected.push_back(left);
+      if (downc == '|' || downc == 'L' || downc == 'J' || downc == 'S') connected.push_back(down);
+      if (leftc == 'F' || leftc == '-' || leftc == 'L' || leftc == 'S') connected.push_back(left);
       break;
     case 'F': // is a 90-degree bend connecting south and east.
-      if (downc == '|' || downc == 'L' || downc == 'J' || downc == 'S')
-        connected.push_back(down);
-      if (rightc == '7' || rightc == '-' || rightc == 'J' || rightc == 'S')
-        connected.push_back(right);
+      if (downc == '|' || downc == 'L' || downc == 'J' || downc == 'S') connected.push_back(down);
+      if (rightc == '7' || rightc == '-' || rightc == 'J' || rightc == 'S') connected.push_back(right);
       break;
     case '.': // is ground; there is no pipe in this tile.
       throw std::runtime_error("You shouldn't be here!");
@@ -121,8 +104,7 @@ int part1(const Data &data) {
   return steps;
 }
 
-int floodfill(const Pos &cur, Data &data, char fill_char = '0',
-              char loop_char = '*') {
+int floodfill(const Pos &cur, Data &data, char fill_char = '0', char loop_char = '*') {
   std::queue<Pos> working_set;
   working_set.push(cur);
   int filled = 0;
@@ -147,14 +129,13 @@ int floodfill(const Pos &cur, Data &data, char fill_char = '0',
       if (upc != '*' && upc != '0' && upc != '\0') working_set.push(up);
       if (downc != '*' && downc != '0' && downc != '\0') working_set.push(down);
       if (leftc != '*' && leftc != '0' && leftc != '\0') working_set.push(left);
-      if (rightc != '*' && rightc != '0' && rightc != '\0')
-        working_set.push(right);
+      if (rightc != '*' && rightc != '0' && rightc != '\0') working_set.push(right);
     }
   }
   return filled;
 }
 
-void replace_s(Data& data, Pos& p1, Pos& p2) {
+void replace_s(Data &data, Pos &p1, Pos &p2) {
   if (p1.i > p2.i) {
     // p1 is above p2
     if (p1.j > p2.j) {
@@ -163,12 +144,10 @@ void replace_s(Data& data, Pos& p1, Pos& p2) {
     } else if (p1.j < p2.j) {
       // and to the left
       data.pipes[data.S.i][data.S.j] = '7';
-    }
-    else {
+    } else {
       data.pipes[data.S.i][data.S.j] = '|';
     }
-  }
-  else if (p1.i < p2.i) {
+  } else if (p1.i < p2.i) {
     // p1 is below p2
     if (p1.j > p2.j) {
       // and to the right
@@ -176,12 +155,10 @@ void replace_s(Data& data, Pos& p1, Pos& p2) {
     } else if (p1.j < p2.j) {
       // and to the left
       data.pipes[data.S.i][data.S.j] = 'J';
-    }
-    else {
+    } else {
       data.pipes[data.S.i][data.S.j] = '|';
     }
-  }
-  else {
+  } else {
     // same line
     data.pipes[data.S.i][data.S.j] = '-';
   }
@@ -274,6 +251,7 @@ int part2(Data data) {
               region = Case::Out;
               break;
             default:
+              break;
           }
         }
       }
