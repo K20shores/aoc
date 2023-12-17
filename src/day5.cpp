@@ -19,7 +19,7 @@ struct Data {
 };
 
 long part1(const Data &data) {
-  long min = LONG_MAX;
+  long min = std::numeric_limits<long>::max();
   for (const auto &seed : data.seeds) {
     long location = seed;
     for (const auto &ranges : data.ranges) {
@@ -39,7 +39,7 @@ long part1(const Data &data) {
 }
 
 int part2(const Data &data) {
-  long min = LONG_MAX;
+  long min = std::numeric_limits<long>::max();
   for (size_t i = 0; i < data.seeds.size(); i += 2) {
     long start = data.seeds[i];
     long n = data.seeds[i + 1];
