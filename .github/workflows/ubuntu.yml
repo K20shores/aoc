@@ -29,30 +29,3 @@ jobs:
         run: |
           cd build
           ctest -C ${{ matrix.build_type }} --rerun-failed --output-on-failure . --verbose
-
-  clang:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        build_type: [Release]
-    steps:
-      - name: Install Clang 16
-        run: |
-          sudo apt update
-          sudo apt install -y clang-16
-          sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-16 100
-          sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-16 100
-
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Run Cmake 
-        run: cmake -S . -B build -D CMAKE_BUILD_TYPE=${{ matrix.build_type }}
-
-      - name: Build
-        run: cmake --build build --verbose
-
-      - name: Run tests
-        run: |
-          cd build
-          ctest -C ${{ matrix.build_type }} --rerun-failed --output-on-failure . --verbose
