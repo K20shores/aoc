@@ -6,16 +6,12 @@
 #include <queue>
 #include <string>
 #include <vector>
+#include <aoc2023/get_char.hpp>
 
 struct Data {
   std::vector<std::string> pipes;
   Pos S;
 };
-
-char get_char(const std::vector<std::string> &data, Pos cur) {
-  if (cur.i >= 0 && cur.i < data.size() && cur.j >= 0 && cur.j < data[cur.i].size()) return data[cur.i][cur.j];
-  return '\0';
-}
 
 std::vector<Pos> connected_pipes(const Pos &cur, const Data &data) {
   long i = cur.i, j = cur.j;

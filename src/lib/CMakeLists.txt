@@ -2,6 +2,7 @@ add_library(aoc2023)
 
 target_sources(aoc2023 
   PRIVATE 
+    get_char.cpp
     maths.cpp
 )
 

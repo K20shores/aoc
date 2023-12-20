@@ -4,14 +4,9 @@
 #include <string>
 #include <vector>
 #include <unordered_map>
+#include <aoc2023/get_char.hpp>
 
 bool is_symbol(char c) { return !std::isdigit(c) && (c != '.'); }
-
-// check if a symbol is touching this position in a halo around the position
-char get_char(const std::vector<std::string> &data, size_t x, size_t y) {
-  if (x >= 0 && x < data.size() && y >= 0 && y < data[x].size()) return data[x][y];
-  return '.';
-}
 
 bool position_is_near_symbol(const std::vector<std::string> &data, size_t x, size_t y) {
   char neighbors[8] = {get_char(data, x - 1, y),     get_char(data, x + 1, y),     get_char(data, x, y - 1),     get_char(data, x, y + 1),
