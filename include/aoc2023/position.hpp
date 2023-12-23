@@ -1,7 +1,7 @@
 #pragma once
 
-#include <stddef.h>
 #include <iostream>
+#include <stddef.h>
 
 struct Pos {
   long i;
@@ -36,6 +36,14 @@ struct Pos {
     this->j -= other.j;
     return *this;
   }
+
+  bool operator<(const Pos &other) const { return (i < other.i) || ((i == other.i) && (j < other.j)); }
+
+  bool operator>(const Pos &other) const { return (i > other.i) || ((i == other.i) && (j > other.j)); }
+
+  bool operator<=(const Pos &other) const { return (i < other.i) || ((i == other.i) && (j <= other.j)); }
+
+  bool operator>=(const Pos &other) const { return (i > other.i) || ((i == other.i) && (j >= other.j)); }
 
   friend std::ostream &operator<<(std::ostream &os, const Pos &pos) {
     os << "(" << pos.i << ", " << pos.j << ")";

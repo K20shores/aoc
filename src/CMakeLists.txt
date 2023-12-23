@@ -30,6 +30,9 @@ create_standard_test(NAME day16 SOURCES day16.cpp)
 create_standard_test(NAME day17 SOURCES day17.cpp)
 create_standard_test(NAME day18 SOURCES day18.cpp)
 create_standard_test(NAME day19 SOURCES day19.cpp)
+create_standard_test(NAME day20 SOURCES day20.cpp)
+create_standard_test(NAME day21 SOURCES day21.cpp)
+create_standard_test(NAME day22 SOURCES day22.cpp)
 
 ################################################################################
 # Copy input data
