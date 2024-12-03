@@ -105,8 +105,8 @@ int main(int argc, char **argv)
 {
   Data data = parse();
 
-  int answer1 = 0;
-  int answer2 = 0;
+  long answer1 = 1258579;
+  long answer2 = 23981443;
 
   auto first = part1(data);
   auto second = part2(data);
