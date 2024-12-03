@@ -33,7 +33,33 @@ int part1(const Data &data)
 
 int part2(const Data &data)
 {
-  return 0;
+  int acc = 0;
+  int control = 1;
+
+  std::regex mul("mul\\(([0-9]+),([0-9]+)\\)|(don\\'t\\(\\)|do\\(\\))");
+  for(auto& line : data.lines) {
+    auto mul_begin = std::sregex_iterator(line.begin(), line.end(), mul);
+    auto mul_end = std::sregex_iterator();
+
+    for (std::sregex_iterator i = mul_begin; i != mul_end; ++i)
+    {
+        std::smatch match = *i;
+        std::string match_str = match.str();
+        if (match_str == "do()") {
+          control = 1;
+        }
+        else if (match_str == "don't()") {
+          control = 0;
+        }
+        else {
+          int left = std::stoi(match[1]);
+          int right = std::stoi(match[2]);
+          acc += left * right * control;
+        }
+    }
+  }
+  return acc;
+
 }
 
 Data parse()
@@ -89,8 +115,8 @@ int main(int argc, char **argv)
 {
   Data data = parse();
 
-  int answer1 = 0;
-  int answer2 = 0;
+  int answer1 = 188192787;
+  int answer2 = 113965544;
 
   auto first = part1(data);
   auto second = part2(data);
