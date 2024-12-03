@@ -6,51 +6,61 @@
 #include <vector>
 #include <benchmark/benchmark.h>
 #include <iterator>
-#include <cmath>
-#include <map>
 
 struct Data {
-  std::vector<int> left;
-  std::vector<int> right;
+  std::vector<std::vector<int>> reports;
 };
 
-long part1(Data data)
-{
-  long acc = 0;
-  std::sort(data.left.begin(), data.left.end());
-  std::sort(data.right.begin(), data.right.end());
-  for(size_t i = 0; i < data.left.size(); ++i) {
-    acc += std::abs(data.left[i] - data.right[i]);
-  }
-  return acc;
-}
+bool is_monotonic(const std::vector<int>& report) {
+  auto left = report.begin();
+  auto right = std::next(left, 1);
+  bool increasing = false;
+  bool decreasing = false;
+  while (left != report.end() && right != report.end()) {
+    bool _increasing = (*left < *right) && (*right > *left);
+    bool _decreasing = (*left > *right) && (*right < *left);
+    increasing |= _increasing;
+    decreasing |= _decreasing;
 
-long part2(const Data &data)
-{
-  std::map<int, int> counts;
-  for(auto& e : data.right) {
-    if (counts.count(e)) {
-      // its in the map, increment
-      counts[e] += 1;
+    if (increasing && decreasing) return false;
+
+    if (_increasing || _decreasing)
+    {
+      int diff = std::abs(*left - *right);
+      if (!(diff >= 1 && diff <= 3)) {
+        return false;
+      } 
     }
     else {
-      // it needs to be initilized
-      counts[e] = 1;
+      return false;
+    }
+    left = std::next(left, 1);
+    right = std::next(right, 1);
+  }
+  return true;
+}
+
+int part1(const Data &data)
+{
+  int safe = 0;
+  for(auto& report: data.reports) {
+    if (is_monotonic(report)) {
+      safe += 1;
+    }
+    else {
     }
   }
-  long acc = 0;
-  for (auto & e : data.left) {
-    if (counts.count(e)) {
-      // its in the map, increment
-      acc += e * counts[e];
-    }
-  }
-  return acc;
+  return safe;
+}
+
+int part2(const Data &data)
+{
+  return 0;
 }
 
 Data parse()
 {
-  std::ifstream file(std::filesystem::path("inputs/day1.txt"));
+  std::ifstream file(std::filesystem::path("inputs/day2.txt"));
   if (!file.is_open())
   {
     throw std::runtime_error("file not found");
@@ -61,10 +71,9 @@ Data parse()
   while (std::getline(file, line))
   {
     std::istringstream buffer(line);
-    std::vector<int> lists{std::istream_iterator<int>(buffer),
-                             std::istream_iterator<int>()};
-    data.left.push_back(lists[0]);
-    data.right.push_back(lists[1]);
+    std::vector<int> report{std::istream_iterator<int>(buffer),
+                            std::istream_iterator<int>()};
+    data.reports.push_back(report);
   }
 
   return data;
@@ -105,8 +114,8 @@ int main(int argc, char **argv)
 {
   Data data = parse();
 
-  long answer1 = 1258579;
-  long answer2 = 23981443;
+  int answer1 = 0;
+  int answer2 = 0;
 
   auto first = part1(data);
   auto second = part2(data);
