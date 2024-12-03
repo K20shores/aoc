@@ -1,4 +1,4 @@
-#include <aoc2023/maths.hpp>
+#include <aoc/2023/maths.hpp>
 #include <benchmark/benchmark.h>
 #include <filesystem>
 #include <fstream>
@@ -171,7 +171,7 @@ int main(int argc, char **argv) {
   Data data = parse();
 
   int answer1 = 7670;
-  long answer2 = 157383940585037;
+  long long answer2 = 157383940585037;
 
   auto first = part1(data);
   auto second = part2(data);

@@ -1,4 +1,4 @@
-#include <aoc2023/position.hpp>
+#include <aoc/2023/position.hpp>
 #include <benchmark/benchmark.h>
 #include <filesystem>
 #include <fstream>
@@ -6,7 +6,7 @@
 #include <queue>
 #include <string>
 #include <vector>
-#include <aoc2023/get_char.hpp>
+#include <aoc/2023/get_char.hpp>
 
 struct Data {
   std::vector<std::string> floor;

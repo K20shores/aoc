@@ -19,7 +19,7 @@ jobs:
         with:
           userid: 44566
           session: ${{ secrets.AOC_SESSION }}    # secret containing session code, see setup on how to obtain
-          year: 2023
+          year: 2024
           
       - uses: stefanzweifel/git-auto-commit-action@v4     # Step that pushes these local changes back to your github repo
         with:

@@ -3,8 +3,8 @@
 cmake_minimum_required(VERSION 3.21)
 
 project(
-  aoc2023
-  VERSION 0.0.2023
+  aoc
+  VERSION 0.0.2024
   LANGUAGES CXX
 )
 
@@ -17,6 +17,12 @@ set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH};${PROJECT_SOURCE_DIR}/cmake")
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
+
+################################################################################
+# options
+
+option(AOC_2023 "Build the AoC 2023 project" OFF)
+option(AOC_2024 "Build the AoC 2023 project" ON)
 
 ################################################################################
 # dependencies

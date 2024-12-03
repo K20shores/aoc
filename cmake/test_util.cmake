@@ -3,15 +3,23 @@
 
 function(create_standard_test)
   set(prefix TEST)
-  set(singleValues NAME WORKING_DIRECTORY)
-  set(multiValues SOURCES)
+  set(singleValues NAME WORKING_DIRECTORY YEAR)
+  set(multiValues SOURCES LIBRARIES)
 
   include(CMakeParseArguments)
   cmake_parse_arguments(${prefix} " " "${singleValues}" "${multiValues}" ${ARGN})
 
+  if(NOT DEFINED TEST_YEAR)
+    message(FATAL_ERROR "TEST_YEAR must be specified")
+  endif()
+
   add_executable(test_${TEST_NAME} ${TEST_SOURCES})
 
-  target_link_libraries(test_${TEST_NAME} PUBLIC benchmark aoc2023)
+  set_target_properties(test_${TEST_NAME} PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${TEST_YEAR}"
+  )
+
+  target_link_libraries(test_${TEST_NAME} PUBLIC benchmark ${TEST_LIBRARIES})
 
   if(NOT DEFINED TEST_WORKING_DIRECTORY)
     set(TEST_WORKING_DIRECTORY "${CMAKE_BINARY_DIR}")

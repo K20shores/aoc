@@ -1,4 +1,4 @@
-#include <aoc2023/position.hpp>
+#include <aoc/2023/position.hpp>
 #include <benchmark/benchmark.h>
 #include <cmath>
 #include <filesystem>
@@ -155,8 +155,8 @@ BENCHMARK_REGISTER_F(BenchmarkFixture, Part2Benchmark);
 int main(int argc, char **argv) {
   Data data = parse();
 
-  long answer1 = 9521776;
-  long answer2 = 553224415344;
+  long long answer1 = 9521776;
+  long long answer2 = 553224415344;
 
   auto first = part1(data);
   auto second = part2(data);

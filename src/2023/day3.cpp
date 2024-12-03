@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 #include <unordered_map>
-#include <aoc2023/get_char.hpp>
+#include <aoc/2023/get_char.hpp>
 
 bool is_symbol(char c) { return !std::isdigit(c) && (c != '.'); }
 

@@ -3,7 +3,7 @@
 #include <cmath>
 #include <cassert>
 
-#include <aoc2023/maths.hpp>
+#include <aoc/2023/maths.hpp>
 
 std::vector<int> get_primes(int n)
 {

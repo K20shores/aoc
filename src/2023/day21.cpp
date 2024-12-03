@@ -1,5 +1,5 @@
-#include <aoc2023/hash.hpp>
-#include <aoc2023/position.hpp>
+#include <aoc/2023/hash.hpp>
+#include <aoc/2023/position.hpp>
 #include <benchmark/benchmark.h>
 #include <filesystem>
 #include <fstream>
@@ -74,7 +74,7 @@ std::pair<int, std::set<std::pair<Pos, int>>> count(const std::vector<std::strin
       if (depth + 1 <= max_depth) {
         for (auto neighbor : out_of_bounds_neighbors(cur, path)) {
           auto next = cur + neighbor;
-          next_positions.insert({{mod(next.i, path.size()), mod(next.j, path[0].size())}, depth + 1});
+          next_positions.insert({{static_cast<long>(mod(next.i, path.size())), static_cast<long>(mod(next.j, path[0].size()))}, depth + 1});
         }
       }
     }
