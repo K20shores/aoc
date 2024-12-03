@@ -12,6 +12,7 @@ add_subdirectory(lib)
 # Problems
 
 create_standard_test(NAME 2024_day1 SOURCES day1.cpp LIBRARIES aoc2024 YEAR 2024)
+create_standard_test(NAME 2024_day2 SOURCES day2.cpp LIBRARIES aoc2024 YEAR 2024)
 
 ################################################################################
 # Copy input data
