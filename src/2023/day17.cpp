@@ -1,5 +1,5 @@
-#include <aoc2023/get_char.hpp>
-#include <aoc2023/position.hpp>
+#include <aoc/2023/get_char.hpp>
+#include <aoc/2023/position.hpp>
 #include <benchmark/benchmark.h>
 #include <filesystem>
 #include <fstream>

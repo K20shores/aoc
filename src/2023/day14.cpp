@@ -1,4 +1,4 @@
-#include <aoc2023/hash.hpp>
+#include <aoc/2023/hash.hpp>
 #include <benchmark/benchmark.h>
 #include <filesystem>
 #include <fstream>

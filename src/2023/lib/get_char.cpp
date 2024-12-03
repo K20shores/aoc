@@ -1,4 +1,4 @@
-#include <aoc2023/get_char.hpp>
+#include <aoc/2023/get_char.hpp>
 
 
 char get_char(const std::vector<std::string> &data, Pos cur, char unfound) {

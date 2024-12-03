@@ -3,7 +3,7 @@
 #include <iostream>
 #include <string>
 
-#include <aoc2023/trie.hpp>
+#include <aoc/2023/trie.hpp>
 
 #include <benchmark/benchmark.h>
 

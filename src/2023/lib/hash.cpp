@@ -1,4 +1,4 @@
-#include <aoc2023/hash.hpp>
+#include <aoc/2023/hash.hpp>
 
 size_t hash(const std::vector<std::string> &strings) {
   std::hash<std::string> hasher;

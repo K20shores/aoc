@@ -4,7 +4,8 @@
 #include <string>
 #include <vector>
 #include <benchmark/benchmark.h>
-#include <aoc2023/position.hpp>
+#include <aoc/2023/position.hpp>
+#include <cmath>
 
 struct Data {
   std::vector<Pos> steps;

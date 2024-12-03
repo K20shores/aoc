@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-#include <aoc2023/maths.hpp>
+#include <aoc/2023/maths.hpp>
 
 struct Node {
   std::string val;
