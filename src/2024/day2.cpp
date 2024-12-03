@@ -47,15 +47,30 @@ int part1(const Data &data)
     if (is_monotonic(report)) {
       safe += 1;
     }
-    else {
-    }
   }
   return safe;
 }
 
 int part2(const Data &data)
 {
-  return 0;
+  int safe = 0;
+  for(auto& report: data.reports) {
+    if (is_monotonic(report)) {
+      safe += 1;
+    }
+    else {
+      for (size_t i = 0; i < report.size(); ++i) {
+        std::vector<int> copy(report);
+        auto it = std::next(copy.begin(), i);
+        copy.erase(it);
+        if (is_monotonic(copy)) {
+          safe += 1;
+          break;
+        }
+      }
+    }
+  }
+  return safe;
 }
 
 Data parse()
@@ -114,7 +129,7 @@ int main(int argc, char **argv)
 {
   Data data = parse();
 
-  int answer1 = 0;
+  int answer1 = 402;
   int answer2 = 0;
 
   auto first = part1(data);
