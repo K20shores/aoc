@@ -22,6 +22,10 @@ int part2(const Data &data)
 Data parse()
 {
   std::ifstream file(std::filesystem::path("inputs/dayX.txt"));
+  if (!file.is_open())
+  {
+    throw std::runtime_error("file not found");
+  }
   std::string line;
   Data data;
 
@@ -79,6 +83,11 @@ int main(int argc, char **argv)
   first != answer1 ? throw std::runtime_error("Part 1 incorrect") : nullptr;
   second != answer2 ? throw std::runtime_error("Part 2 incorrect") : nullptr;
 
-  benchmark::Initialize(&argc, argv);
-  benchmark::RunSpecifiedBenchmarks();
+  for (int i = 1; i < argc; ++i) {
+    if (std::string(argv[i]) == "--benchmark") {
+      benchmark::Initialize(&argc, argv);
+      benchmark::RunSpecifiedBenchmarks();
+      return 0;
+    }
+  }
 }
