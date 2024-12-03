@@ -22,7 +22,7 @@ function(create_standard_test)
   target_link_libraries(test_${TEST_NAME} PUBLIC benchmark ${TEST_LIBRARIES})
 
   if(NOT DEFINED TEST_WORKING_DIRECTORY)
-    set(TEST_WORKING_DIRECTORY "${CMAKE_BINARY_DIR}")
+    set(TEST_WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/${TEST_YEAR}")
   endif()
 
   add_aoc_test(${TEST_NAME} test_${TEST_NAME} "" ${TEST_WORKING_DIRECTORY})
