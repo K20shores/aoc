@@ -70,7 +70,28 @@ int part1(const Data &data)
 
 int part2(const Data &data)
 {
-  return 0;
+  size_t width = data.grid[0].size();
+  size_t height = data.grid.size();
+  int count = 0;
+
+  for(size_t y = 1; y < data.grid.size() - 1; ++y) {
+    for(size_t x = 1; x < data.grid[0].size() - 1; ++x) {
+      if (data.grid[y][x] == 'A') {
+        char top_left = data.grid[y-1][x-1];
+        char top_right = data.grid[y-1][x+1];
+        char bottom_left = data.grid[y+1][x-1];
+        char bottom_right = data.grid[y+1][x+1];
+
+        bool negative_diagonal_matches = (top_left == 'M' && bottom_right == 'S') || (top_left == 'S' && bottom_right == 'M');
+        bool positive_diagonal_matches = (top_right == 'M' && bottom_left == 'S') || (top_right == 'S' && bottom_left == 'M');
+
+        if (negative_diagonal_matches && positive_diagonal_matches) {
+          count += 1;
+        }
+      }
+    }
+  }
+  return count;
 }
 
 Data parse()
@@ -126,8 +147,8 @@ int main(int argc, char **argv)
 {
   Data data = parse();
 
-  int answer1 = 0;
-  int answer2 = 0;
+  int answer1 = 2654;
+  int answer2 = 1990;
 
   auto first = part1(data);
   auto second = part2(data);
