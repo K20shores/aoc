@@ -130,7 +130,7 @@ int main(int argc, char **argv)
   Data data = parse();
 
   int answer1 = 402;
-  int answer2 = 0;
+  int answer2 = 455;
 
   auto first = part1(data);
   auto second = part2(data);
