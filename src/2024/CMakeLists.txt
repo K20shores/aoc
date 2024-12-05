@@ -19,8 +19,12 @@ create_standard_test(NAME 2024_day4 SOURCES day4.cpp LIBRARIES aoc2024 YEAR 2024
 ################################################################################
 # Copy input data
 
-add_custom_target(copy_2024_input_data ALL
-  COMMAND ${CMAKE_COMMAND} -E copy_directory
-    ${CMAKE_CURRENT_SOURCE_DIR}/inputs
-    ${CMAKE_BINARY_DIR}/2024/$<CONFIG>/inputs
-)
+
+# only copy inputs if input directory exists
+if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/inputs)
+  add_custom_target(copy_2024_input_data ALL
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+      ${CMAKE_CURRENT_SOURCE_DIR}/inputs
+      ${CMAKE_BINARY_DIR}/2024/$<CONFIG>/inputs
+  )
+endif()
