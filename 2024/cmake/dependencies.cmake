@@ -10,3 +10,5 @@ FetchContent_Declare(
 )
 
 FetchContent_MakeAvailable(benchmark)
+
+find_package(OpenMP REQUIRED)
