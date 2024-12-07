@@ -4,6 +4,8 @@
 #include <string>
 #include <vector>
 #include <benchmark/benchmark.h>
+#include <tuple>
+#include <unordered_set>
 
 struct Pos {
   int y = 0;
@@ -20,11 +22,32 @@ struct Pos {
     this->y += other.y;
     return *this;
   }
+
+  bool operator==(const Pos& other) const {
+      return this->x == other.x && this->y == other.y;
+  }
+};
+
+struct PosHash {
+    size_t operator()(const Pos& pos) const {
+        return std::hash<int>()(pos.y) ^ (std::hash<int>()(pos.x) << 1);
+    }
+};
+
+struct PosPairHash {
+    size_t operator()(const std::pair<Pos, Pos>& key) const {
+        const auto& [pos, dir] = key;
+        return std::hash<int>()(pos.y) ^ (std::hash<int>()(pos.x) << 1) ^ 
+               (std::hash<int>()(dir.y) << 2) ^ (std::hash<int>()(dir.x) << 3);
+    }
 };
 
 struct Data {
   std::vector<std::string> map;
   Pos p;
+  Pos dir;
+  std::unordered_set<Pos, PosHash> path;
+  std::unordered_set<std::pair<Pos, Pos>, PosPairHash> position_direction_set;
 };
 
 Pos up = {-1, 0};
@@ -36,37 +59,27 @@ Pos next_dir(Pos original) {
   return Pos{.y = original.x, .x = -original.y};
 }
 
-char get_next_grid_char(const std::vector<std::string>& map, const Pos& p, const Pos& dir) {
+char get_next_grid_char(const std::vector<std::string>& map, const Pos& p, const Pos& dir, const Pos& obstacle = {-1, -1}) {
   if (p.y + dir.y < map.size() && p.x + dir.x < map[0].size()) {
+    if (p.y + dir.y == obstacle.y && p.x + dir.x == obstacle.x) {
+      return '#';
+    }
     return map[p.y + dir.y][p.x + dir.x];
   }
   return '\0';
 }
 
-int part1(const Data &data)
+int part1(Data &data)
 {
-  auto map = data.map;
   Pos p = data.p;
-  Pos dir;
-  char c = map[p.y][p.x];
-  switch(c) {
-    case '^':
-      dir = up;
-      break;
-    case 'v':
-      dir = down;
-      break;
-    case '>':
-      dir = right;
-      break;
-    case '<':
-      dir = left;
-      break;
-  }
+  Pos dir = data.dir;
+  std::unordered_set<Pos, PosHash> visited;
 
   while (true) {
-    char next = get_next_grid_char(map, p, dir);
-    map[p.y][p.x] = 'X';
+    char next = get_next_grid_char(data.map, p, dir);
+    data.position_direction_set.insert({p, dir});
+    data.path.insert(p);
+    visited.insert(p);
     if (next == '\0') break;
     if (next == '#') {
       dir = next_dir(dir);
@@ -74,18 +87,41 @@ int part1(const Data &data)
     p += dir;
   }
 
-  int sum = 0;
-  for(auto& row : map) {
-    for(auto & c : row) {
-      if (c == 'X') sum += 1;
-    }
-  }
-  return sum;
+  return visited.size();
 }
 
 int part2(const Data &data)
 {
   return 0;
+  int cycles = 0;
+  auto path = data.path;
+
+  // for (const auto& obstacle : path) {
+    std::unordered_set<std::pair<Pos, Pos>, PosPairHash> visited;
+
+    Pos p = data.p;
+    Pos dir = data.dir;
+    Pos o = {.y = p.y, .x = p.x - 1};
+
+    // if (obstacle == p) continue; // ignore the startin location
+    while (true) {
+      char next = get_next_grid_char(data.map, p, dir, o);
+      if (visited.find({p, dir}) == visited.end()) {
+        // haven't been here before
+        visited.insert({p, dir});
+      }
+      else {
+        cycles += 1;
+      }
+      if (next == '\0') break;
+      if (next == '#') {
+        dir = next_dir(dir);
+      }
+      p += dir;
+    }
+  // }
+
+  return cycles;
 }
 
 Data parse()
@@ -115,6 +151,22 @@ Data parse()
       }
     }
     ++i;
+  }
+
+  char c = data.map[data.p.y][data.p.x];
+  switch(c) {
+    case '^':
+      data.dir = up;
+      break;
+    case 'v':
+      data.dir = down;
+      break;
+    case '>':
+      data.dir = right;
+      break;
+    case '<':
+      data.dir = left;
+      break;
   }
 
   return data;
