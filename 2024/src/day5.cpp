@@ -11,10 +11,12 @@ struct Data {
   std::vector<std::vector<int>> pages;
 };
 
-int part1(const Data &data)
+std::pair<int, std::vector<size_t>> part1(const Data &data)
 {
   int sum = 0;
-  for (auto page : data.pages) {
+  std::vector<size_t> indexes;
+  for (size_t idx = 0; idx < data.pages.size(); ++idx) {
+    auto page = data.pages[idx];
     bool correct = true;
     for(size_t i = 0; i < page.size(); ++i) {
       auto elem = page[i];
@@ -23,6 +25,7 @@ int part1(const Data &data)
           for(size_t j = 0; j < i; ++j) {
             if (page[j] == after) {
               correct = false;
+              indexes.push_back(idx);
               goto done;
             }
           }
@@ -32,22 +35,31 @@ int part1(const Data &data)
     done:
     if (correct) {
       sum += page[page.size()/2];
-      // std::cout << "correct: ";
     }
-    else {
-      // std::cout << "incorrect: ";
-    }
-    // for(auto& e: page) { 
-    //   std::cout << e << " ";
-    // }
-    // std::cout << std::endl;
   }
-  return sum;
+  return std::make_pair(sum, indexes);
 }
 
-int part2(const Data &data)
+int part2(const Data &data, const std::vector<size_t> &indexes)
 {
-  return 0;
+  int sum = 0;
+  auto compare = [&data](const int& a, const int& b) {
+    if (data.orderings.find(a) != data.orderings.end()) {
+      auto it = std::find(data.orderings.at(a).begin(), data.orderings.at(a).end(), b);
+      if (it != data.orderings.at(a).end()) {
+        return true;
+      }
+    }
+    return false;
+  };
+
+  for(auto& idx : indexes) {
+    auto pages = data.pages[idx];
+    std::sort(pages.begin(), pages.end(), compare);
+    sum += pages[pages.size()/2];
+  }
+
+  return sum;
 }
 
 std::vector<std::string> split(std::string s, std::string delimiter) {
@@ -118,7 +130,7 @@ BENCHMARK_DEFINE_F(BenchmarkFixture, Part1Benchmark)
 {
   for (auto _ : state)
   {
-    int s = part1(data);
+    auto s = part1(data);
     benchmark::DoNotOptimize(s);
   }
 }
@@ -126,9 +138,10 @@ BENCHMARK_DEFINE_F(BenchmarkFixture, Part1Benchmark)
 BENCHMARK_DEFINE_F(BenchmarkFixture, Part2Benchmark)
 (benchmark::State &state)
 {
+  auto first = part1(data);
   for (auto _ : state)
   {
-    int s = part2(data);
+    int s = part2(data, first.second);
     benchmark::DoNotOptimize(s);
   }
 }
@@ -141,15 +154,15 @@ int main(int argc, char **argv)
   Data data = parse();
 
   int answer1 = 5713;
-  int answer2 = 0;
+  int answer2 = 5180;
 
   auto first = part1(data);
-  auto second = part2(data);
+  auto second = part2(data, first.second);
 
-  std::cout << "Part 1: " << first << std::endl;
+  std::cout << "Part 1: " << first.first << std::endl;
   std::cout << "Part 2: " << second << std::endl;
 
-  first != answer1 ? throw std::runtime_error("Part 1 incorrect") : nullptr;
+  first.first != answer1 ? throw std::runtime_error("Part 1 incorrect") : nullptr;
   second != answer2 ? throw std::runtime_error("Part 2 incorrect") : nullptr;
 
   for (int i = 1; i < argc; ++i) {
