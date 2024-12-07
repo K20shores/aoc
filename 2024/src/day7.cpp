@@ -4,10 +4,28 @@
 #include <string>
 #include <vector>
 #include <benchmark/benchmark.h>
+#include <aoc/2024/split.h>
+#include <functional>
 
 struct Data {
-
+  std::vector<long long> targets;
+  std::vector<std::vector<int>> nums;
 };
+
+template <typename BinaryOp>
+bool get_value(long long target, long long acc, std::vector<int> nums, BinaryOp op) {
+  long long first = nums[0];
+
+  if (nums.size() == 1) {
+    long long result = op(acc, first);
+    return result == target;
+  }
+
+  std::vector<int> rest{nums.begin()+1, nums.end()};
+  long long result = op(first, acc);
+
+  if (get_value(target, acc, rest, std::plus))
+}
 
 int part1(const Data &data)
 {
@@ -31,6 +49,9 @@ Data parse()
 
   while (std::getline(file, line))
   {
+    auto pos = line.find(':');
+    data.targets.push_back(std::stoll(line.substr(0, pos)));
+    data.nums.push_back(split_to_int(line.substr(pos+2), " "));
   }
 
   return data;
