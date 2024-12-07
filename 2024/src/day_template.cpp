@@ -75,9 +75,9 @@ int main(int argc, char **argv)
   int answer2 = 0;
 
   auto first = part1(data);
-  auto second = part2(data);
-
   std::cout << "Part 1: " << first << std::endl;
+  
+  auto second = part2(data);
   std::cout << "Part 2: " << second << std::endl;
 
   first != answer1 ? throw std::runtime_error("Part 1 incorrect") : nullptr;
