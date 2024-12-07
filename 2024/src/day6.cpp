@@ -7,47 +7,55 @@
 #include <tuple>
 #include <unordered_set>
 
-struct Pos {
+struct Pos
+{
   int y = 0;
   int x = 0;
 
-  Pos& operator+(const Pos other) {
-    this->x += other.x;
-    this->y += other.y;
-    return *this;
-  }
-  
-  Pos& operator+=(const Pos& other) {
+  Pos &operator+(const Pos other)
+  {
     this->x += other.x;
     this->y += other.y;
     return *this;
   }
 
-  bool operator==(const Pos& other) const {
-      return this->x == other.x && this->y == other.y;
+  Pos &operator+=(const Pos &other)
+  {
+    this->x += other.x;
+    this->y += other.y;
+    return *this;
+  }
+
+  bool operator==(const Pos &other) const
+  {
+    return this->x == other.x && this->y == other.y;
   }
 };
 
-struct PosHash {
-    size_t operator()(const Pos& pos) const {
-        return std::hash<int>()(pos.y) ^ (std::hash<int>()(pos.x) << 1);
-    }
+struct PosHash
+{
+  size_t operator()(const Pos &pos) const
+  {
+    return std::hash<int>()(pos.y) ^ (std::hash<int>()(pos.x) << 1);
+  }
 };
 
-struct PosPairHash {
-    size_t operator()(const std::pair<Pos, Pos>& key) const {
-        const auto& [pos, dir] = key;
-        return std::hash<int>()(pos.y) ^ (std::hash<int>()(pos.x) << 1) ^ 
-               (std::hash<int>()(dir.y) << 2) ^ (std::hash<int>()(dir.x) << 3);
-    }
+struct PosPairHash
+{
+  size_t operator()(const std::pair<Pos, Pos> &key) const
+  {
+    const auto &[pos, dir] = key;
+    return std::hash<int>()(pos.y) ^ (std::hash<int>()(pos.x) << 1) ^
+           (std::hash<int>()(dir.y) << 2) ^ (std::hash<int>()(dir.x) << 3);
+  }
 };
 
-struct Data {
+struct Data
+{
   std::vector<std::string> map;
   Pos p;
   Pos dir;
   std::unordered_set<Pos, PosHash> path;
-  std::unordered_set<std::pair<Pos, Pos>, PosPairHash> position_direction_set;
 };
 
 Pos up = {-1, 0};
@@ -55,13 +63,17 @@ Pos down = {1, 0};
 Pos left = {0, -1};
 Pos right = {0, 1};
 
-Pos next_dir(Pos original) {
+Pos next_dir(Pos original)
+{
   return Pos{.y = original.x, .x = -original.y};
 }
 
-char get_next_grid_char(const std::vector<std::string>& map, const Pos& p, const Pos& dir, const Pos& obstacle = {-1, -1}) {
-  if (p.y + dir.y < map.size() && p.x + dir.x < map[0].size()) {
-    if (p.y + dir.y == obstacle.y && p.x + dir.x == obstacle.x) {
+char get_next_grid_char(const std::vector<std::string> &map, const Pos &p, const Pos &dir, const Pos &obstacle = {-1, -1})
+{
+  if (p.y + dir.y < map.size() && p.x + dir.x < map[0].size())
+  {
+    if (p.y + dir.y == obstacle.y && p.x + dir.x == obstacle.x)
+    {
       return '#';
     }
     return map[p.y + dir.y][p.x + dir.x];
@@ -75,14 +87,17 @@ int part1(Data &data)
   Pos dir = data.dir;
   std::unordered_set<Pos, PosHash> visited;
 
-  while (true) {
-    char next = get_next_grid_char(data.map, p, dir);
-    data.position_direction_set.insert({p, dir});
+  while (true)
+  {
     data.path.insert(p);
     visited.insert(p);
-    if (next == '\0') break;
-    if (next == '#') {
+    char next = get_next_grid_char(data.map, p, dir);
+    if (next == '\0')
+      break;
+    while (next == '#')
+    {
       dir = next_dir(dir);
+      next = get_next_grid_char(data.map, p, dir);
     }
     p += dir;
   }
@@ -92,34 +107,41 @@ int part1(Data &data)
 
 int part2(const Data &data)
 {
-  return 0;
   int cycles = 0;
   auto path = data.path;
 
-  // for (const auto& obstacle : path) {
+  for (const auto &obstacle : path)
+  {
     std::unordered_set<std::pair<Pos, Pos>, PosPairHash> visited;
 
     Pos p = data.p;
     Pos dir = data.dir;
-    Pos o = {.y = p.y, .x = p.x - 1};
 
-    // if (obstacle == p) continue; // ignore the startin location
-    while (true) {
-      char next = get_next_grid_char(data.map, p, dir, o);
-      if (visited.find({p, dir}) == visited.end()) {
+    if (obstacle == p)
+      continue; // ignore the starting location
+    while (true)
+    {
+      if (visited.find({p, dir}) == visited.end())
+      {
         // haven't been here before
         visited.insert({p, dir});
       }
-      else {
+      else
+      {
         cycles += 1;
+        break;
       }
-      if (next == '\0') break;
-      if (next == '#') {
+      char next = get_next_grid_char(data.map, p, dir, obstacle);
+      if (next == '\0')
+        break;
+      while (next == '#')
+      {
         dir = next_dir(dir);
+        next = get_next_grid_char(data.map, p, dir, obstacle);
       }
       p += dir;
     }
-  // }
+  }
 
   return cycles;
 }
@@ -143,8 +165,10 @@ Data parse()
     auto p3 = line.find('>');
     auto p4 = line.find('<');
     auto a = {p1, p2, p3, p4};
-    for(auto& p : a) {
-      if (p != std::string::npos) {
+    for (auto &p : a)
+    {
+      if (p != std::string::npos)
+      {
         data.p.y = i;
         data.p.x = p;
         break;
@@ -154,19 +178,20 @@ Data parse()
   }
 
   char c = data.map[data.p.y][data.p.x];
-  switch(c) {
-    case '^':
-      data.dir = up;
-      break;
-    case 'v':
-      data.dir = down;
-      break;
-    case '>':
-      data.dir = right;
-      break;
-    case '<':
-      data.dir = left;
-      break;
+  switch (c)
+  {
+  case '^':
+    data.dir = up;
+    break;
+  case 'v':
+    data.dir = down;
+    break;
+  case '>':
+    data.dir = right;
+    break;
+  case '<':
+    data.dir = left;
+    break;
   }
 
   return data;
@@ -200,27 +225,29 @@ BENCHMARK_DEFINE_F(BenchmarkFixture, Part2Benchmark)
   }
 }
 
-BENCHMARK_REGISTER_F(BenchmarkFixture, Part1Benchmark);
-BENCHMARK_REGISTER_F(BenchmarkFixture, Part2Benchmark);
+BENCHMARK_REGISTER_F(BenchmarkFixture, Part1Benchmark)->Unit(benchmark::kSecond);
+BENCHMARK_REGISTER_F(BenchmarkFixture, Part2Benchmark)->Unit(benchmark::kSecond);
 
 int main(int argc, char **argv)
 {
   Data data = parse();
 
   int answer1 = 5312;
-  int answer2 = 0;
+  int answer2 = 1748;
 
   auto first = part1(data);
-  auto second = part2(data);
-
   std::cout << "Part 1: " << first << std::endl;
+
+  auto second = part2(data);
   std::cout << "Part 2: " << second << std::endl;
 
   first != answer1 ? throw std::runtime_error("Part 1 incorrect") : nullptr;
   second != answer2 ? throw std::runtime_error("Part 2 incorrect") : nullptr;
 
-  for (int i = 1; i < argc; ++i) {
-    if (std::string(argv[i]) == "--benchmark") {
+  for (int i = 1; i < argc; ++i)
+  {
+    if (std::string(argv[i]) == "--benchmark")
+    {
       benchmark::Initialize(&argc, argv);
       benchmark::RunSpecifiedBenchmarks();
       return 0;
