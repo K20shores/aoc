@@ -35,6 +35,10 @@ struct Pos
     }
     return this->y < other.y;
   }
+
+  Pos operator*(const int& x) {
+    return {.x = this->x * x, .y = this->y * x};
+  }
 };
 
 struct PosHash
