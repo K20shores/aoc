@@ -23,15 +23,19 @@ int part1(const Data &data)
 
   for (const auto &[key, positions] : data.locations)
   {
-    for(size_t i = 0; i < positions.size() - 1; ++i) {
+    for (size_t i = 0; i < positions.size() - 1; ++i)
+    {
       Pos left = positions[i];
-      for(size_t j = i+1; j < positions.size(); ++j) {
+      for (size_t j = i + 1; j < positions.size(); ++j)
+      {
         Pos right = positions[j];
         Pos dif = left - right;
         Pos p1 = right - dif;
         Pos p2 = left + dif;
-        for(const auto& p : {p1, p2}) {
-          if (0 <= p.x && p.x < data.width && 0 <= p.y && p.y < data.height) {
+        for (const auto &p : {p1, p2})
+        {
+          if (0 <= p.x && p.x < data.width && 0 <= p.y && p.y < data.height)
+          {
             unique_locations.insert(p);
           }
         }
@@ -39,12 +43,47 @@ int part1(const Data &data)
     }
   }
 
-  return unique_locations.size();;
+  return unique_locations.size();
+  ;
 }
 
 int part2(const Data &data)
 {
-  return 0;
+  std::set<Pos> unique_locations;
+
+  for (const auto &[key, positions] : data.locations)
+  {
+    for (size_t i = 0; i < positions.size() - 1; ++i)
+    {
+      Pos left = positions[i];
+      for (size_t j = i + 1; j < positions.size(); ++j)
+      {
+        Pos right = positions[j];
+        unique_locations.insert(right);
+        unique_locations.insert(left);
+        Pos dif = left - right;
+        int i = 1;
+        bool in;
+        do 
+        {
+          in = false;
+          Pos p1 = right - dif * i;
+          Pos p2 = left + dif * i;
+          for (const auto &p : {p1, p2})
+          {
+            if (0 <= p.x && p.x < data.width && 0 <= p.y && p.y < data.height)
+            {
+              in = true;
+              unique_locations.insert(p);
+            }
+          }
+          i += 1;
+        } while (in);
+      }
+    }
+  }
+
+  return unique_locations.size();
 }
 
 Data parse()
@@ -118,7 +157,7 @@ int main(int argc, char **argv)
   Data data = parse();
 
   int answer1 = 271;
-  int answer2 = 0;
+  int answer2 = 994;
 
   auto first = part1(data);
   std::cout << "Part 1: " << first << std::endl;
