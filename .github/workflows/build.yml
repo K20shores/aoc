@@ -8,7 +8,7 @@ concurrency:
 
 jobs:
   build:
-    continue-on-error: true;
+    continue-on-error: true
     strategy:
       matrix:
         build_type: [Release]
