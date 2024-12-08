@@ -2,3 +2,4 @@ build
 inputs
 inputs
 .vscode
+.DS_Store

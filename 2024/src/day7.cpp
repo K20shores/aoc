@@ -5,36 +5,81 @@
 #include <vector>
 #include <benchmark/benchmark.h>
 #include <aoc/2024/split.h>
-#include <functional>
 
 struct Data {
   std::vector<long long> targets;
   std::vector<std::vector<int>> nums;
 };
 
-template <typename BinaryOp>
-bool get_value(long long target, long long acc, std::vector<int> nums, BinaryOp op) {
-  long long first = nums[0];
-
-  if (nums.size() == 1) {
-    long long result = op(acc, first);
-    return result == target;
+bool is_possible(long long target, long long acc, std::vector<int> nums) {
+  if (nums.size() == 0) {
+    return acc == target;
   }
 
+  long long first = nums[0];
   std::vector<int> rest{nums.begin()+1, nums.end()};
-  long long result = op(first, acc);
 
-  if (get_value(target, acc, rest, std::plus))
+  bool plus_result = is_possible(target, acc + first, rest);
+  bool multiply_result = is_possible(target, acc * first, rest);
+
+  return plus_result || multiply_result;
 }
 
-int part1(const Data &data)
+template <class T>
+int numDigits(T number)
 {
-  return 0;
+    int digits = 0;
+    if (number < 0) digits = 1;
+    while (number) {
+        number /= 10;
+        digits++;
+    }
+    return digits;
 }
 
-int part2(const Data &data)
+bool is_possible2(long long target, long long acc, std::vector<int> nums) {
+  if (nums.size() == 0) {
+    return acc == target;
+  }
+
+  long long first = nums[0];
+  std::vector<int> rest{nums.begin()+1, nums.end()};
+
+  int num_digits = numDigits(first);
+
+  bool plus_result = is_possible2(target, acc + first, rest);
+  bool multiply_result = is_possible2(target, acc * first, rest);
+  bool concat_result = is_possible2(target, acc * std::pow(10, num_digits) + first, rest);
+
+  return plus_result || multiply_result || concat_result;
+}
+
+long long part1(const Data &data)
 {
-  return 0;
+  long long sum = 0;
+  for(size_t i = 0; i < data.targets.size(); ++i) {
+    long long target = data.targets[i];
+    std::vector<int> nums = data.nums[i];
+
+    if (is_possible(target, 0, nums)) {
+      sum += target;
+    }
+  }
+  return sum;
+}
+
+long long part2(const Data &data)
+{
+  long long sum = 0;
+  for(size_t i = 0; i < data.targets.size(); ++i) {
+    long long target = data.targets[i];
+    std::vector<int> nums = data.nums[i];
+
+    if (is_possible2(target, 0, nums)) {
+      sum += target;
+    }
+  }
+  return sum;
 }
 
 Data parse()
@@ -85,15 +130,15 @@ BENCHMARK_DEFINE_F(BenchmarkFixture, Part2Benchmark)
   }
 }
 
-BENCHMARK_REGISTER_F(BenchmarkFixture, Part1Benchmark);
-BENCHMARK_REGISTER_F(BenchmarkFixture, Part2Benchmark);
+BENCHMARK_REGISTER_F(BenchmarkFixture, Part1Benchmark)->Unit(benchmark::kSecond);
+BENCHMARK_REGISTER_F(BenchmarkFixture, Part2Benchmark)->Unit(benchmark::kSecond);
 
 int main(int argc, char **argv)
 {
   Data data = parse();
 
-  int answer1 = 0;
-  int answer2 = 0;
+  long long answer1 = 10741443549536;
+  long long answer2 = 500335179214836;
 
   auto first = part1(data);
   std::cout << "Part 1: " << first << std::endl;
