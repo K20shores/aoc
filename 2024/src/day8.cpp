@@ -19,46 +19,24 @@ struct Data
 
 int part1(const Data &data)
 {
-  std::cout << std::format("{} {}\n", data.width, data.height);
-  for (const auto &[key, positions] : data.locations)
-  {
-    std::cout << std::format("Key: {} -> Positions: ", key);
-    for (const auto &pos : positions)
-    {
-      std::cout << std::format("({}, {}) ", pos.x, pos.y);
-    }
-    std::cout << "\n";
-  }
-
   std::set<Pos> unique_locations;
 
   for (const auto &[key, positions] : data.locations)
   {
     for(size_t i = 0; i < positions.size() - 1; ++i) {
       Pos left = positions[i];
-      for(size_t j = 1; j < positions.size(); ++j) {
+      for(size_t j = i+1; j < positions.size(); ++j) {
         Pos right = positions[j];
         Pos dif = left - right;
         Pos p1 = right - dif;
         Pos p2 = left + dif;
         for(const auto& p : {p1, p2}) {
           if (0 <= p.x && p.x < data.width && 0 <= p.y && p.y < data.height) {
-            std::cout << std::format("({}, {})\n", p.x, p.y);
             unique_locations.insert(p);
           }
         }
       }
     }
-  }
-
-  auto map = data.map;
-  for(auto& p : unique_locations) {
-    if (map[p.y][p.x] == '.') {
-      map[p.y][p.x] = '#';
-    }
-  }
-  for (auto& l : map) {
-    std::cout << l << std::endl;
   }
 
   return unique_locations.size();;
@@ -94,7 +72,7 @@ Data parse()
         {
           data.locations[c] = {};
         }
-        data.locations[c].push_back({.y = col, .x = row});
+        data.locations[c].push_back({.x = row, .y = col});
       }
     }
     row += 1;
@@ -139,7 +117,7 @@ int main(int argc, char **argv)
 {
   Data data = parse();
 
-  int answer1 = 0;
+  int answer1 = 271;
   int answer2 = 0;
 
   auto first = part1(data);

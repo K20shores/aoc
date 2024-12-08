@@ -2,8 +2,8 @@
 
 struct Pos
 {
-  int64_t y = 0;
   int64_t x = 0;
+  int64_t y = 0;
 
   Pos operator+(const Pos other)
   {

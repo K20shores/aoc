@@ -31,4 +31,9 @@ if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/inputs)
       ${CMAKE_CURRENT_SOURCE_DIR}/inputs
       ${CMAKE_BINARY_DIR}/inputs
   )
+  add_custom_target(copy_2024_input_data_config ALL
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+      ${CMAKE_CURRENT_SOURCE_DIR}/inputs
+      ${CMAKE_BINARY_DIR}/$<CONFIG>/inputs
+  )
 endif()
