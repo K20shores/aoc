@@ -23,7 +23,7 @@ Pos right = {0, 1};
 
 Pos next_dir(Pos original)
 {
-  return Pos{.y = original.x, .x = -original.y};
+  return Pos{.x = -original.y, .y = original.x};
 }
 
 char get_next_grid_char(const std::vector<std::string> &map, const Pos &p, const Pos &dir, const Pos &obstacle = {-1, -1})
