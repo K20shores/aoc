@@ -139,8 +139,8 @@ int main(int argc, char **argv)
   auto second = part2(data);
   std::cout << "Part 2: " << second << std::endl;
 
-  // first != answer1 ? throw std::runtime_error("Part 1 incorrect") : nullptr;
-  // second != answer2 ? throw std::runtime_error("Part 2 incorrect") : nullptr;
+  first != answer1 ? throw std::runtime_error("Part 1 incorrect") : nullptr;
+  second != answer2 ? throw std::runtime_error("Part 2 incorrect") : nullptr;
 
   for (int i = 1; i < argc; ++i) {
     if (std::string(argv[i]) == "--benchmark") {
