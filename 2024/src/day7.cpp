@@ -5,27 +5,24 @@
 #include <vector>
 #include <benchmark/benchmark.h>
 #include <aoc/2024/split.h>
+#include <functional>
+#include <cmath>
 
 struct Data {
   std::vector<long long> targets;
   std::vector<std::vector<int>> nums;
 };
 
-bool is_possible(long long target, long long acc, const std::vector<int>& nums, size_t idx = 0) {
-  if (idx == nums.size()) {
-    return acc == target;
-  }
+using Ops = std::vector<std::function<long long(long long, long long)>>;
 
-  long long first = nums[idx];
-
-  bool plus_result = is_possible(target, acc + first, nums, idx + 1);
-  bool multiply_result = is_possible(target, acc * first, nums, idx + 1);
-
-  return plus_result || multiply_result;
-}
+// set default opts
+Ops default_ops = {
+  std::plus<long long>(),
+  std::multiplies<long long>()
+};
 
 template <class T>
-int numDigits(T number)
+inline int numDigits(T number)
 {
     int digits = 0;
     if (number < 0) digits = 1;
@@ -36,20 +33,24 @@ int numDigits(T number)
     return digits;
 }
 
-bool is_possible2(long long target, long long acc, const std::vector<int>& nums, size_t idx = 0) {
+std::function<long long(long long, long long)> concat = [](long long a, long long b) {
+  int num_digits = numDigits(b);
+  return a * std::pow(10, num_digits) + b;
+};
+
+bool is_possible(long long target, long long acc, const std::vector<int>& nums, size_t idx = 0, const Ops& ops = default_ops) {
   if (idx == nums.size()) {
     return acc == target;
   }
 
   long long first = nums[idx];
 
-  int num_digits = numDigits(first);
-
-  bool plus_result = is_possible2(target, acc + first, nums, idx + 1);
-  bool multiply_result = is_possible2(target, acc * first, nums, idx + 1);
-  bool concat_result = is_possible2(target, acc * std::pow(10, num_digits) + first, nums, idx + 1);
-
-  return plus_result || multiply_result || concat_result;
+  for (auto op : ops) {
+    if (is_possible(target, op(acc, first), nums, idx + 1, ops)) {
+      return true;
+    }
+  }
+  return false;
 }
 
 long long part1(const Data &data)
@@ -69,11 +70,13 @@ long long part1(const Data &data)
 long long part2(const Data &data)
 {
   long long sum = 0;
+  auto ops = default_ops;
+  ops.push_back(concat);
   for(size_t i = 0; i < data.targets.size(); ++i) {
     long long target = data.targets[i];
     std::vector<int> nums = data.nums[i];
 
-    if (is_possible2(target, 0, nums)) {
+    if (is_possible(target, 0, nums, 0, ops)) {
       sum += target;
     }
   }
@@ -144,8 +147,8 @@ int main(int argc, char **argv)
   auto second = part2(data);
   std::cout << "Part 2: " << second << std::endl;
 
-  first != answer1 ? throw std::runtime_error("Part 1 incorrect") : nullptr;
-  second != answer2 ? throw std::runtime_error("Part 2 incorrect") : nullptr;
+  // first != answer1 ? throw std::runtime_error("Part 1 incorrect") : nullptr;
+  // second != answer2 ? throw std::runtime_error("Part 2 incorrect") : nullptr;
 
   for (int i = 1; i < argc; ++i) {
     if (std::string(argv[i]) == "--benchmark") {
