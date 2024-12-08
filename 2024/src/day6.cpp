@@ -6,49 +6,7 @@
 #include <benchmark/benchmark.h>
 #include <tuple>
 #include <unordered_set>
-
-struct Pos
-{
-  int y = 0;
-  int x = 0;
-
-  Pos &operator+(const Pos other)
-  {
-    this->x += other.x;
-    this->y += other.y;
-    return *this;
-  }
-
-  Pos &operator+=(const Pos &other)
-  {
-    this->x += other.x;
-    this->y += other.y;
-    return *this;
-  }
-
-  bool operator==(const Pos &other) const
-  {
-    return this->x == other.x && this->y == other.y;
-  }
-};
-
-struct PosHash
-{
-  size_t operator()(const Pos &pos) const
-  {
-    return std::hash<int>()(pos.y) ^ (std::hash<int>()(pos.x) << 1);
-  }
-};
-
-struct PosPairHash
-{
-  size_t operator()(const std::pair<Pos, Pos> &key) const
-  {
-    const auto &[pos, dir] = key;
-    return std::hash<int>()(pos.y) ^ (std::hash<int>()(pos.x) << 1) ^
-           (std::hash<int>()(dir.y) << 2) ^ (std::hash<int>()(dir.x) << 3);
-  }
-};
+#include <aoc/2024/pos.h>
 
 struct Data
 {
