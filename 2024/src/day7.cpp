@@ -37,19 +37,18 @@ int numDigits(T number)
     return digits;
 }
 
-bool is_possible2(long long target, long long acc, std::vector<int> nums) {
-  if (nums.size() == 0) {
+bool is_possible2(long long target, long long acc, const std::vector<int>& nums, size_t idx = 0) {
+  if (idx == nums.size()) {
     return acc == target;
   }
 
-  long long first = nums[0];
-  std::vector<int> rest{nums.begin()+1, nums.end()};
+  long long first = nums[idx];
 
   int num_digits = numDigits(first);
 
-  bool plus_result = is_possible2(target, acc + first, rest);
-  bool multiply_result = is_possible2(target, acc * first, rest);
-  bool concat_result = is_possible2(target, acc * std::pow(10, num_digits) + first, rest);
+  bool plus_result = is_possible2(target, acc + first, nums, idx + 1);
+  bool multiply_result = is_possible2(target, acc * first, nums, idx + 1);
+  bool concat_result = is_possible2(target, acc * std::pow(10, num_digits) + first, nums, idx + 1);
 
   return plus_result || multiply_result || concat_result;
 }
