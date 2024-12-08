@@ -11,16 +11,15 @@ struct Data {
   std::vector<std::vector<int>> nums;
 };
 
-bool is_possible(long long target, long long acc, std::vector<int> nums) {
-  if (nums.size() == 0) {
+bool is_possible(long long target, long long acc, const std::vector<int>& nums, size_t idx = 0) {
+  if (idx == nums.size()) {
     return acc == target;
   }
 
-  long long first = nums[0];
-  std::vector<int> rest{nums.begin()+1, nums.end()};
+  long long first = nums[idx];
 
-  bool plus_result = is_possible(target, acc + first, rest);
-  bool multiply_result = is_possible(target, acc * first, rest);
+  bool plus_result = is_possible(target, acc + first, nums, idx + 1);
+  bool multiply_result = is_possible(target, acc * first, nums, idx + 1);
 
   return plus_result || multiply_result;
 }
