@@ -21,21 +21,15 @@ Ops default_ops = {
   std::multiplies<long long>()
 };
 
-template <class T>
-inline int numDigits(T number)
-{
-    int digits = 0;
-    if (number < 0) digits = 1;
-    while (number) {
-        number /= 10;
-        digits++;
-    }
-    return digits;
-}
-
 std::function<long long(long long, long long)> concat = [](long long a, long long b) {
-  int num_digits = numDigits(b);
-  return a * std::pow(10, num_digits) + b;
+  long long number = b;
+  int digits = 0;
+  if (number < 0) digits = 1;
+  while (number) {
+      number /= 10;
+      digits++;
+  }
+  return a * std::pow(10, digits) + b;
 };
 
 bool is_possible(long long target, long long acc, const std::vector<int>& nums, size_t idx = 0, const Ops& ops = default_ops) {
@@ -43,10 +37,8 @@ bool is_possible(long long target, long long acc, const std::vector<int>& nums, 
     return acc == target;
   }
 
-  long long first = nums[idx];
-
   for (auto op : ops) {
-    if (is_possible(target, op(acc, first), nums, idx + 1, ops)) {
+    if (is_possible(target, op(acc, nums[idx]), nums, idx + 1, ops)) {
       return true;
     }
   }
