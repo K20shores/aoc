@@ -13,7 +13,7 @@ jobs:
       matrix:
         build_type: [Release]
         os:
-          - ubuntu-latest
+          - ubuntu-24.04
           - windows-latest
           - macos-latest
     runs-on: ${{ matrix.os }}
