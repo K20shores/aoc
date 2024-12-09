@@ -46,65 +46,47 @@ long long part1(const Data &data)
   auto left = diskmap.begin();
   auto right = --diskmap.end();
   while (left != right) {
-    while(left->first != -1) {
+    while(left->first != -1 && left != right) {
       ++left;
-      if (left == right) break;
     }
-    if (left == right) break;
-    while(right->first == -1) {
+    while(right->first == -1 && left != right) {
       --right;
-      if (left == right) break;
     }
     if (left == right) break;
+
     int remaining_space = left->second;
     int needed_space = right->second;
     if (remaining_space > needed_space) {
       // there is enough space to entirely fit the right block
-      int new_space = remaining_space - needed_space;
-      // set the id of this block
       left->first = right->first;
-      // set its size
       left->second = right->second;
-      // insert new blank space to the right
-      diskmap.insert(std::next(left), {-1, new_space});
-
-      // the block at the end is now unallocated
+      diskmap.insert(std::next(left), {-1, remaining_space - needed_space});
       right->first = -1;
     }
     else {
       // we can only partially fill this block
-      // assign the id
+      // move some of the block on the right to the left
+      // left's space will be entirely filled and doesn't need to change
       left->first = right->first;
-      // remove part of the space at the end
       right->second -= remaining_space;
-      // and add the now blank space to the right
       diskmap.insert(std::next(right), {-1, remaining_space});
     }
-
     // print(diskmap);
   }
 
-  // now combine all of the empty spaces 
-  while (left->first != -1) {
-    ++left;
-  }
-  right = std::next(left);
-  while(right != diskmap.end()) {
-    left->second += right->second;
-    auto temp = std::next(right);
-    diskmap.erase(right);
-    right = temp;
-  }
   // print(diskmap);
 
   long long sum = 0;
   left = diskmap.begin();
-  // the blank space
-  right = --diskmap.end();
   int i = 0;
-  while(left != right) {
-    for(int j = 0; j < left->second; ++j, ++i) {
-      sum += left->first * i;
+  while(left != diskmap.end()) {
+    if (left->first != -1) {
+      for(int j = 0; j < left->second; ++j, ++i) {
+        sum += left->first * i;
+      }
+    }
+    else {
+      i += left->second;
     }
     ++left;
   }
@@ -124,11 +106,8 @@ long long part2(const Data &data)
     --right;
   }
   while (right != diskmap.begin()) {
-    while(left->first != -1) {
+    while(left->first != -1 && left != right) {
       ++left;
-      if (left == right) {
-        break;
-      }
     }
     if (left == right) {
       left = diskmap.begin();
@@ -147,9 +126,7 @@ long long part2(const Data &data)
     if (remaining_space >= needed_space) {
       // there is enough space to entirely fit the right block
       int new_space = remaining_space - needed_space;
-      // set the id of this block
       left->first = right->first;
-      // set its size
       left->second = right->second;
       // insert new blank space to the right
       if (new_space > 0) {
@@ -264,7 +241,7 @@ int main(int argc, char **argv)
   Data data = parse();
 
   long long answer1 = 6349606724455;
-  long long answer2 = 0;
+  long long answer2 = 6376648986651;
 
   auto first = part1(data);
   std::cout << "Part 1: " << first << std::endl;
