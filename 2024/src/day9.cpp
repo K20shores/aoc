@@ -6,6 +6,7 @@
 #include <benchmark/benchmark.h>
 #include <list>
 #include <format>
+#include <set>
 
 struct Data {
   std::string map;
@@ -30,17 +31,17 @@ void formatted(auto list) {
 }
 
 void print(auto list) {
-  for(auto& p : list) {
-    std::cout << std::format("({}, {}) ", p.first, p.second);
-  }
-  std::cout << std::endl;
+  // for(auto& p : list) {
+  //   std::cout << std::format("({}, {}) ", p.first, p.second);
+  // }
+  // std::cout << std::endl;
   formatted(list);
 }
 
-int part1(const Data &data)
+long long part1(const Data &data)
 {
   auto diskmap = data.diskmap;
-  print(diskmap);
+  // print(diskmap);
 
   auto left = diskmap.begin();
   auto right = --diskmap.end();
@@ -49,10 +50,12 @@ int part1(const Data &data)
       ++left;
       if (left == right) break;
     }
+    if (left == right) break;
     while(right->first == -1) {
       --right;
       if (left == right) break;
     }
+    if (left == right) break;
     int remaining_space = left->second;
     int needed_space = right->second;
     if (remaining_space > needed_space) {
@@ -68,7 +71,7 @@ int part1(const Data &data)
       // the block at the end is now unallocated
       right->first = -1;
     }
-    else if {
+    else {
       // we can only partially fill this block
       // assign the id
       left->first = right->first;
@@ -78,13 +81,125 @@ int part1(const Data &data)
       diskmap.insert(std::next(right), {-1, remaining_space});
     }
 
-    print(diskmap);
+    // print(diskmap);
   }
+
+  // now combine all of the empty spaces 
+  while (left->first != -1) {
+    ++left;
+  }
+  right = std::next(left);
+  while(right != diskmap.end()) {
+    left->second += right->second;
+    auto temp = std::next(right);
+    diskmap.erase(right);
+    right = temp;
+  }
+  // print(diskmap);
+
+  long long sum = 0;
+  left = diskmap.begin();
+  // the blank space
+  right = --diskmap.end();
+  int i = 0;
+  while(left != right) {
+    for(int j = 0; j < left->second; ++j, ++i) {
+      sum += left->first * i;
+    }
+    ++left;
+  }
+  return sum;
 }
 
-int part2(const Data &data)
+long long part2(const Data &data)
 {
-  return 0;
+  int last_id = 0;
+  std::set<int> moved;
+  auto diskmap = data.diskmap;
+  // print(diskmap);
+
+  auto left = diskmap.begin();
+  auto right = --diskmap.end();
+  while(right->first == -1) {
+    --right;
+  }
+  while (right != diskmap.begin()) {
+    while(left->first != -1) {
+      ++left;
+      if (left == right) {
+        break;
+      }
+    }
+    if (left == right) {
+      left = diskmap.begin();
+      --right;
+      while(right->first == -1 || moved.contains(right->first)) {
+        --right;
+        if (right == diskmap.begin()) break;
+      }
+      if (right == diskmap.begin()) break;
+      continue;
+    }
+
+    int remaining_space = left->second;
+    int needed_space = right->second;
+
+    if (remaining_space >= needed_space) {
+      // there is enough space to entirely fit the right block
+      int new_space = remaining_space - needed_space;
+      // set the id of this block
+      left->first = right->first;
+      // set its size
+      left->second = right->second;
+      // insert new blank space to the right
+      if (new_space > 0) {
+        diskmap.insert(std::next(left), {-1, new_space});
+      }
+      moved.insert(left->first);
+      left = diskmap.begin();
+      
+      // the block at the end is now unallocated
+      right->first = -1;
+      --right;
+      while(right->first == -1 || moved.contains(right->first)) {
+        --right;
+        if (right == diskmap.begin()) break;
+      }
+      if (right == diskmap.begin()) break;
+    }
+    else {
+        ++left;
+        if (left == right) {
+          left = diskmap.begin();
+          --right;
+          while(right->first == -1 || moved.contains(right->first)) {
+            --right;
+            if (right == diskmap.begin()) break;
+          }
+          if (right == diskmap.begin()) break;
+          continue;
+        }
+    }
+    // print(diskmap);
+  }
+
+  // print(diskmap);
+
+  long long sum = 0;
+  left = diskmap.begin();
+  int i = 0;
+  while(left != diskmap.end()) {
+    if (left->first != -1) {
+      for(int j = 0; j < left->second; ++j, ++i) {
+        sum += left->first * i;
+      }
+    }
+    else {
+      i += left->second;
+    }
+    ++left;
+  }
+  return sum;
 }
 
 Data parse()
@@ -148,8 +263,8 @@ int main(int argc, char **argv)
 {
   Data data = parse();
 
-  int answer1 = 0;
-  int answer2 = 0;
+  long long answer1 = 6349606724455;
+  long long answer2 = 0;
 
   auto first = part1(data);
   std::cout << "Part 1: " << first << std::endl;
