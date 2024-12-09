@@ -59,7 +59,6 @@ long long checksum(std::list<std::pair<int, int>> diskmap) {
 long long part1(const Data &data)
 {
   auto diskmap = data.diskmap;
-  // print(diskmap);
 
   auto left = diskmap.begin();
   auto right = --diskmap.end();
@@ -78,6 +77,7 @@ long long part1(const Data &data)
       // there is enough space to entirely fit the right block
       left->first = right->first;
       left->second = right->second;
+      // insert the remaining space to the right
       diskmap.insert(std::next(left), {-1, remaining_space - needed_space});
       right->first = -1;
     }
@@ -89,10 +89,8 @@ long long part1(const Data &data)
       right->second -= remaining_space;
       diskmap.insert(std::next(right), {-1, remaining_space});
     }
-    // print(diskmap);
   }
 
-  // print(diskmap);
   return checksum(diskmap);
 }
 
