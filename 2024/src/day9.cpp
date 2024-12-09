@@ -96,7 +96,6 @@ long long part1(const Data &data)
 
 long long part2(const Data &data)
 {
-  int last_id = 0;
   std::set<int> moved;
   auto diskmap = data.diskmap;
   // print(diskmap);
