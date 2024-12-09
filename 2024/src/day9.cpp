@@ -102,12 +102,12 @@ long long part2(const Data &data)
 
   auto left = diskmap.begin();
   auto right = --diskmap.end();
-  while(right->first == -1) {
-    --right;
-  }
   while (right != diskmap.begin()) {
     while(left->first != -1 && left != right) {
       ++left;
+    }
+    while(right->first == -1 && left != right) {
+      --right;
     }
     if (left == right) {
       left = diskmap.begin();
@@ -137,25 +137,9 @@ long long part2(const Data &data)
       
       // the block at the end is now unallocated
       right->first = -1;
-      --right;
-      while(right->first == -1 || moved.contains(right->first)) {
-        --right;
-        if (right == diskmap.begin()) break;
-      }
-      if (right == diskmap.begin()) break;
     }
     else {
-        ++left;
-        if (left == right) {
-          left = diskmap.begin();
-          --right;
-          while(right->first == -1 || moved.contains(right->first)) {
-            --right;
-            if (right == diskmap.begin()) break;
-          }
-          if (right == diskmap.begin()) break;
-          continue;
-        }
+      ++left;
     }
     // print(diskmap);
   }
