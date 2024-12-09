@@ -149,8 +149,8 @@ BENCHMARK_DEFINE_F(BenchmarkFixture, Part2Benchmark)
   }
 }
 
-BENCHMARK_REGISTER_F(BenchmarkFixture, Part1Benchmark)->Unit(benchmark::kSecond);
-BENCHMARK_REGISTER_F(BenchmarkFixture, Part2Benchmark)->Unit(benchmark::kSecond);
+BENCHMARK_REGISTER_F(BenchmarkFixture, Part1Benchmark)->Unit(benchmark::kMicrosecond);
+BENCHMARK_REGISTER_F(BenchmarkFixture, Part2Benchmark)->Unit(benchmark::kMicrosecond);
 
 int main(int argc, char **argv)
 {

@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <benchmark/benchmark.h>
+#include <format>
 
 struct Data {
 
