@@ -38,6 +38,24 @@ void print(auto list) {
   formatted(list);
 }
 
+long long checksum(std::list<std::pair<int, int>> diskmap) {
+  long long sum = 0;
+  auto left = diskmap.begin();
+  int i = 0;
+  while(left != diskmap.end()) {
+    if (left->first != -1) {
+      for(int j = 0; j < left->second; ++j, ++i) {
+        sum += left->first * i;
+      }
+    }
+    else {
+      i += left->second;
+    }
+    ++left;
+  }
+  return sum;
+}
+
 long long part1(const Data &data)
 {
   auto diskmap = data.diskmap;
@@ -75,22 +93,7 @@ long long part1(const Data &data)
   }
 
   // print(diskmap);
-
-  long long sum = 0;
-  left = diskmap.begin();
-  int i = 0;
-  while(left != diskmap.end()) {
-    if (left->first != -1) {
-      for(int j = 0; j < left->second; ++j, ++i) {
-        sum += left->first * i;
-      }
-    }
-    else {
-      i += left->second;
-    }
-    ++left;
-  }
-  return sum;
+  return checksum(diskmap);
 }
 
 long long part2(const Data &data)
@@ -134,7 +137,6 @@ long long part2(const Data &data)
       }
       moved.insert(left->first);
       left = diskmap.begin();
-      
       // the block at the end is now unallocated
       right->first = -1;
     }
@@ -145,22 +147,7 @@ long long part2(const Data &data)
   }
 
   // print(diskmap);
-
-  long long sum = 0;
-  left = diskmap.begin();
-  int i = 0;
-  while(left != diskmap.end()) {
-    if (left->first != -1) {
-      for(int j = 0; j < left->second; ++j, ++i) {
-        sum += left->first * i;
-      }
-    }
-    else {
-      i += left->second;
-    }
-    ++left;
-  }
-  return sum;
+  return checksum(diskmap);
 }
 
 Data parse()
