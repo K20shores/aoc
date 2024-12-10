@@ -19,76 +19,51 @@ bool is_in_grid(const Pos& p, const Data& data) {
   return p.x >= 0 && p.y >= 0 && p.x < data.map[0].size() && p.y < data.map.size();
 }
 
-std::set<Pos> find_nines(
+std::pair<std::set<Pos>, int> find_nines(
     Pos cur, 
-    std::map<Pos, std::set<Pos>>& leads_to_nine, 
+    std::map<Pos, std::pair<std::set<Pos>, int>>& leads_to_nine, 
     const Data& data) {
-  if (!leads_to_nine.contains(cur)) {
-    leads_to_nine[cur] = {};
-  }
-  else {
-    return leads_to_nine[cur];
-  }
-  int cur_val = data.map[cur.y][cur.x];
-  if (cur_val == 9) {
-    leads_to_nine[cur].insert(cur);
+  if (leads_to_nine.contains(cur)) {
     return leads_to_nine[cur];
   }
 
+  int cur_val = data.map[cur.y][cur.x];
+  if (cur_val == 9) {
+    leads_to_nine[cur] = {{cur}, 1};
+    return leads_to_nine[cur];
+  }
+
+  leads_to_nine[cur] = {};
   for(auto& dir: directions) {
     auto next = cur + dir;
     if (is_in_grid(next, data) && data.map[next.y][next.x] - 1 == cur_val) {
       auto result = find_nines(next, leads_to_nine, data);
-      for(auto& r : result) {
-        leads_to_nine[cur].insert(r);
-      }
+      leads_to_nine[cur].first.insert(result.first.begin(), result.first.end());
+      leads_to_nine[cur].second += result.second;
     }
   }
 
   return leads_to_nine[cur];
 }
 
-int all_trails(
-    Pos cur, 
-    std::map<Pos, int>& leads_to_nine, 
-    const Data& data) {
-  if (leads_to_nine.contains(cur)) {
-    return leads_to_nine[cur];
-  }
-  int cur_val = data.map[cur.y][cur.x];
-  if (cur_val == 9) {
-    return 1;
-  }
-
-  int total = 0;
-  for(auto& dir: directions) {
-    auto next = cur + dir;
-    if (is_in_grid(next, data) && data.map[next.y][next.x] - 1 == cur_val) {
-      total += all_trails(next, leads_to_nine, data);
-    }
-  }
-
-  return total;
-}
-
 int part1(const Data &data)
 {
-  std::map<Pos, std::set<Pos>> leads_to_nine;
+  std::map<Pos, std::pair<std::set<Pos>, int>> leads_to_nine;
 
   int sum = 0;
   for(auto& zero : data.zeros) {
-    sum += find_nines(zero, leads_to_nine, data).size();
+    sum += find_nines(zero, leads_to_nine, data).first.size();
   }
   return sum;
 }
 
 int part2(const Data &data)
 {
-  std::map<Pos, int> leads_to_nine;
+  std::map<Pos, std::pair<std::set<Pos>, int>> leads_to_nine;
 
   int sum = 0;
   for(auto& zero : data.zeros) {
-    sum += all_trails(zero, leads_to_nine, data);
+    sum += find_nines(zero, leads_to_nine, data).second;
   }
   return sum;
 }
@@ -157,7 +132,7 @@ int main(int argc, char **argv)
   Data data = parse();
 
   int answer1 = 574;
-  int answer2 = 0;
+  int answer2 = 1238;
 
   auto first = part1(data);
   std::cout << "Part 1: " << first << std::endl;
