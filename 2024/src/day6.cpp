@@ -16,11 +16,6 @@ struct Data
   std::unordered_set<Pos, PosHash> path;
 };
 
-Pos up = {.x = 0, .y = -1};
-Pos down = {.x = 0, .y = 1};
-Pos left = {.x = -1, .y = 0};
-Pos right = {.x = 1, .y = 0};
-
 Pos next_dir(Pos original)
 {
   return Pos{.x = -original.y, .y = original.x};

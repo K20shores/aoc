@@ -1,4 +1,5 @@
 #include <unordered_set>
+#include <vector>
 
 struct Pos
 {
@@ -58,3 +59,10 @@ struct PosPairHash
            (std::hash<int>()(dir.y) << 2) ^ (std::hash<int>()(dir.x) << 3);
   }
 };
+
+Pos up = {.x = 0, .y = -1};
+Pos down = {.x = 0, .y = 1};
+Pos left = {.x = -1, .y = 0};
+Pos right = {.x = 1, .y = 0};
+
+std::vector<Pos> directions = {up, down, left, right};
