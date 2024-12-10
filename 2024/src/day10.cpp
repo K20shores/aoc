@@ -22,36 +22,53 @@ bool is_in_grid(const Pos& p, const Data& data) {
 std::set<Pos> find_nines(
     Pos cur, 
     std::map<Pos, std::set<Pos>>& leads_to_nine, 
-    const Data& data, 
-    std::unordered_set<Pos, PosHash>& visited) {
+    const Data& data) {
   if (!leads_to_nine.contains(cur)) {
     leads_to_nine[cur] = {};
   }
   else {
     return leads_to_nine[cur];
   }
-  visited.insert(cur);
   int cur_val = data.map[cur.y][cur.x];
   if (cur_val == 9) {
     leads_to_nine[cur].insert(cur);
     return leads_to_nine[cur];
   }
 
-  std::set<Pos> reachable_nines = {};
   for(auto& dir: directions) {
     auto next = cur + dir;
-    if (is_in_grid(next, data) && !visited.contains(next) && data.map[next.y][next.x] - 1 == cur_val) {
-      auto result = find_nines(next, leads_to_nine, data, visited);
+    if (is_in_grid(next, data) && data.map[next.y][next.x] - 1 == cur_val) {
+      auto result = find_nines(next, leads_to_nine, data);
       for(auto& r : result) {
-        reachable_nines.insert(r);
+        leads_to_nine[cur].insert(r);
       }
     }
   }
-  for(auto& n : reachable_nines) {
-    leads_to_nine[cur].insert(n);
-  }
 
   return leads_to_nine[cur];
+}
+
+int all_trails(
+    Pos cur, 
+    std::map<Pos, int>& leads_to_nine, 
+    const Data& data) {
+  if (leads_to_nine.contains(cur)) {
+    return leads_to_nine[cur];
+  }
+  int cur_val = data.map[cur.y][cur.x];
+  if (cur_val == 9) {
+    return 1;
+  }
+
+  int total = 0;
+  for(auto& dir: directions) {
+    auto next = cur + dir;
+    if (is_in_grid(next, data) && data.map[next.y][next.x] - 1 == cur_val) {
+      total += all_trails(next, leads_to_nine, data);
+    }
+  }
+
+  return total;
 }
 
 int part1(const Data &data)
@@ -60,15 +77,20 @@ int part1(const Data &data)
 
   int sum = 0;
   for(auto& zero : data.zeros) {
-    std::unordered_set<Pos, PosHash> visited;
-    sum += find_nines(zero, leads_to_nine, data, visited).size();
+    sum += find_nines(zero, leads_to_nine, data).size();
   }
   return sum;
 }
 
 int part2(const Data &data)
 {
-  return 0;
+  std::map<Pos, int> leads_to_nine;
+
+  int sum = 0;
+  for(auto& zero : data.zeros) {
+    sum += all_trails(zero, leads_to_nine, data);
+  }
+  return sum;
 }
 
 Data parse()
@@ -127,14 +149,14 @@ BENCHMARK_DEFINE_F(BenchmarkFixture, Part2Benchmark)
   }
 }
 
-BENCHMARK_REGISTER_F(BenchmarkFixture, Part1Benchmark)->Unit(benchmark::kSecond);
-BENCHMARK_REGISTER_F(BenchmarkFixture, Part2Benchmark)->Unit(benchmark::kSecond);
+BENCHMARK_REGISTER_F(BenchmarkFixture, Part1Benchmark)->Unit(benchmark::kMicrosecond);
+BENCHMARK_REGISTER_F(BenchmarkFixture, Part2Benchmark)->Unit(benchmark::kMicrosecond);
 
 int main(int argc, char **argv)
 {
   Data data = parse();
 
-  int answer1 = 0;
+  int answer1 = 574;
   int answer2 = 0;
 
   auto first = part1(data);
