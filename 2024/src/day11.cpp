@@ -9,6 +9,13 @@
 #include <stack>
 #include <queue>
 
+struct Node {
+  Node* left;
+  Node* right;
+  int value;
+  int steps_to_split;
+};
+
 struct Data
 {
   std::vector<int> stones;
@@ -16,62 +23,81 @@ struct Data
 
 int part1(const Data &data)
 {
+  std::map<int, std::unique_ptr<Node>> splits;
   int sum = 0;
-  std::map<int, std::vector<int>> splits;
 
   for (auto &stone : data.stones)
   {
     // stone value, depth
     std::queue<std::pair<int, int>> q;
     q.push({stone, 0});
-    std::vector<int> split(25, 0);
+    sum += 1;
+    int n_steps = 6;
 
     while (!q.empty())
     {
-      auto stone = q.front();
-      if (!splits.contains(stone.first)) {
-        splits[stone.first] = std::vector(25, 0);
-      }
+      auto val = q.front();
+      Node* cur = nullptr;
 
-      for (size_t blink = stone.second; blink < 25; ++blink)
+      if (!splits.contains(val.first)) {
+        splits[val.first] = std::make_unique<Node>(Node{.left = nullptr, .right = nullptr, .value = val.first, .steps_to_split = 0});
+      }
+      cur = splits[val.first].get();
+
+      for (size_t blink = val.second; blink < n_steps; ++blink)
       {
-        if (splits.contains(stone.first))
+        if (splits.contains(val.first) && cur->left != nullptr)
         {
-          for(size_t i = blink; i < splits[stone.first].size(); ++i) {
-            split[i] += splits[stone.first][i];
+          cur = splits[val.first].get();
+          if (cur->left != nullptr && cur->right != nullptr)
+          {
+            if (cur->steps_to_split + blink > n_steps)
+            {
+              break;
+            }
+            sum += 1;
+            blink += cur->steps_to_split;
+            cur = cur->left;
+            val.first = cur->value;
+            continue;
           }
-          blink = splits[stone.first].size();
-          continue;
         }
 
-        int num_digits = std::floor(std::log10(stone.first)) + 1;
-        if (stone.first == 0)
+        int num_digits = std::floor(std::log10(val.first)) + 1;
+        if (val.first == 0)
         {
-          stone.first = 1;
+          val.first = 1;
+          cur->steps_to_split += 1;
         }
         else if (num_digits % 2 == 0)
         {
-          int right_half = stone.first % int(std::pow(10, num_digits / 2));
-          stone.first /= std::pow(10, num_digits / 2);
-          q.push({right_half, stone.second + 1});
-          split[blink] += 1;
+          int right_half = val.first % int(std::pow(10, num_digits / 2));
+          val.first /= std::pow(10, num_digits / 2);
+          sum += 1;
+          if (!splits.contains(right_half))
+          {
+            splits[right_half] = std::make_unique<Node>(Node{.left = nullptr, .right = nullptr, .value = right_half, .steps_to_split = 0});
+          }
+          if (!splits.contains(val.first))
+          {
+            splits[val.first] = std::make_unique<Node>(Node{.left = nullptr, .right = nullptr, .value = val.first, .steps_to_split = 0});
+          }
+          cur->left = splits[val.first].get();
+          cur->right = splits[right_half].get();
+          cur = cur->left;
+          q.push({right_half, blink + 1});
         }
         else
         {
-          stone.first *= 2024;
+          val.first *= 2024;
+          cur->steps_to_split += 1;
         }
-        stone.second += 1;
       }
       q.pop();
     }
-
-    splits[stone] = split;
-    sum += split[24];
   }
-    int j = 0;
-    j +=  1;
 
-  return 0;
+  return sum;
 }
 
 int part2(const Data &data)
