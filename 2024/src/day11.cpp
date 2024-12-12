@@ -30,7 +30,8 @@ Node *get_node(uint64_t new_value, std::map<uint64_t, std::unique_ptr<Node>> &sp
   return splits[new_value].get();
 }
 
-uint64_t count_stones(int blinks, const Data& data) {
+uint64_t count_stones(int blinks, const Data &data)
+{
   std::map<uint64_t, std::unique_ptr<Node>> splits;
   uint64_t sum = 0;
 
@@ -45,7 +46,6 @@ uint64_t count_stones(int blinks, const Data& data) {
     {
       auto val = q.front();
       Node *cur = get_node(val.first, splits);
-
 
       for (size_t blink = val.second; blink < blinks; ++blink)
       {
@@ -94,6 +94,49 @@ uint64_t count_stones(int blinks, const Data& data) {
   return sum;
 }
 
+uint64_t count_stones_smartly(int blinks, const Data &data)
+{
+  std::map<uint64_t, uint64_t> numbers;
+  for (auto &stone : data.stones)
+  {
+    numbers[stone] = 1;
+  }
+
+  for (size_t i = 0; i < blinks; ++i)
+  {
+    std::map<uint64_t, uint64_t> new_numbers;
+    for (const auto &[value, count] : numbers)
+    {
+      uint64_t num_digits = std::floor(std::log10(value)) + 1;
+      if (value == 0)
+      {
+        new_numbers[1] += count;
+      }
+      else if (num_digits % 2 == 0)
+      {
+        uint64_t right_half = value % uint64_t(std::pow(10, num_digits / 2));
+        uint64_t left_half = value / std::pow(10, num_digits / 2);
+        new_numbers[left_half] += count;
+        new_numbers[right_half] += count;
+      }
+      else
+      {
+        new_numbers[value * 2024] += count;
+      }
+    }
+    numbers.swap(new_numbers);
+  }
+
+  uint64_t sum = 0;
+
+  for (auto &[value, count] : numbers)
+  {
+    sum += count;
+  }
+
+  return sum;
+}
+
 uint64_t part1(const Data &data)
 {
   return count_stones(25, data);
@@ -101,7 +144,7 @@ uint64_t part1(const Data &data)
 
 uint64_t part2(const Data &data)
 {
-  return count_stones(75, data);
+  return count_stones_smartly(75, data);
 }
 
 Data parse()
@@ -118,7 +161,6 @@ Data parse()
   {
     data.stones = split_to_int(line, " ");
   }
-  std::cout << "Parsed " << data.stones.size() << " stones" << std::endl;
 
   return data;
 }
@@ -159,7 +201,7 @@ int main(int argc, char **argv)
   Data data = parse();
 
   uint64_t answer1 = 198089;
-  uint64_t answer2 = 0;
+  uint64_t answer2 = 236302670835517;
 
   auto first = part1(data);
   std::cout << "Part 1: " << first << std::endl;
