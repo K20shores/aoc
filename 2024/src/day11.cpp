@@ -9,11 +9,11 @@
 #include <stack>
 #include <queue>
 
-struct Node {
-  Node* left;
-  Node* right;
-  int value;
-  int steps_to_split;
+struct Node
+{
+  Node *left;
+  Node *right;
+  uint64_t value;
 };
 
 struct Data
@@ -21,76 +21,72 @@ struct Data
   std::vector<int> stones;
 };
 
-int part1(const Data &data)
+Node *get_node(uint64_t new_value, std::map<uint64_t, std::unique_ptr<Node>> &splits)
 {
-  std::map<int, std::unique_ptr<Node>> splits;
-  int sum = 0;
+  if (!splits.contains(new_value))
+  {
+    splits[new_value] = std::make_unique<Node>(Node{.left = nullptr, .right = nullptr, .value = new_value});
+  }
+  return splits[new_value].get();
+}
+
+uint64_t part1(const Data &data)
+{
+  std::map<uint64_t, std::unique_ptr<Node>> splits;
+  uint64_t sum = 0;
 
   for (auto &stone : data.stones)
   {
     // stone value, depth
-    std::queue<std::pair<int, int>> q;
+    std::queue<std::pair<uint64_t, uint64_t>> q;
     q.push({stone, 0});
     sum += 1;
-    int n_steps = 6;
+    uint64_t n_steps = 25;
 
     while (!q.empty())
     {
       auto val = q.front();
-      Node* cur = nullptr;
+      Node *cur = get_node(val.first, splits);
 
-      if (!splits.contains(val.first)) {
-        splits[val.first] = std::make_unique<Node>(Node{.left = nullptr, .right = nullptr, .value = val.first, .steps_to_split = 0});
-      }
-      cur = splits[val.first].get();
 
       for (size_t blink = val.second; blink < n_steps; ++blink)
       {
-        if (splits.contains(val.first) && cur->left != nullptr)
+        while (cur->left != nullptr && blink < n_steps)
         {
-          cur = splits[val.first].get();
-          if (cur->left != nullptr && cur->right != nullptr)
+          if (cur->right != nullptr)
           {
-            if (cur->steps_to_split + blink > n_steps)
-            {
-              break;
-            }
-            sum += 1;
-            blink += cur->steps_to_split;
-            cur = cur->left;
-            val.first = cur->value;
-            continue;
+            ++sum;
+            q.push({cur->right->value, blink + 1});
           }
+          ++blink;
+          cur = cur->left;
         }
-
-        int num_digits = std::floor(std::log10(val.first)) + 1;
-        if (val.first == 0)
+        if (blink >= n_steps)
+          break;
+        uint64_t num_digits = std::floor(std::log10(cur->value)) + 1;
+        if (cur->value == 0)
         {
-          val.first = 1;
-          cur->steps_to_split += 1;
+          Node *next = get_node(1, splits);
+          cur->left = next;
+          cur = cur->left;
         }
         else if (num_digits % 2 == 0)
         {
-          int right_half = val.first % int(std::pow(10, num_digits / 2));
-          val.first /= std::pow(10, num_digits / 2);
+          uint64_t right_half = cur->value % uint64_t(std::pow(10, num_digits / 2));
+          uint64_t left_half = cur->value / std::pow(10, num_digits / 2);
           sum += 1;
-          if (!splits.contains(right_half))
-          {
-            splits[right_half] = std::make_unique<Node>(Node{.left = nullptr, .right = nullptr, .value = right_half, .steps_to_split = 0});
-          }
-          if (!splits.contains(val.first))
-          {
-            splits[val.first] = std::make_unique<Node>(Node{.left = nullptr, .right = nullptr, .value = val.first, .steps_to_split = 0});
-          }
-          cur->left = splits[val.first].get();
-          cur->right = splits[right_half].get();
+          Node *left = get_node(left_half, splits);
+          Node *right = get_node(right_half, splits);
+          cur->left = left;
+          cur->right = right;
           cur = cur->left;
           q.push({right_half, blink + 1});
         }
         else
         {
-          val.first *= 2024;
-          cur->steps_to_split += 1;
+          Node *next = get_node(cur->value * 2024, splits);
+          cur->left = next;
+          cur = cur->left;
         }
       }
       q.pop();
@@ -137,7 +133,7 @@ BENCHMARK_DEFINE_F(BenchmarkFixture, Part1Benchmark)
 {
   for (auto _ : state)
   {
-    int s = part1(data);
+    uint64_t s = part1(data);
     benchmark::DoNotOptimize(s);
   }
 }
@@ -159,7 +155,7 @@ int main(int argc, char **argv)
 {
   Data data = parse();
 
-  int answer1 = 0;
+  uint64_t answer1 = 0;
   int answer2 = 0;
 
   auto first = part1(data);
