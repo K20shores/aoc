@@ -24,56 +24,72 @@ struct Node {
 
 int part1(const Data &data)
 {
-  std::set<Pos> visited;
+  std::set<Pos> unvisited;
   std::map<char, std::vector<std::pair<int, int>>> dimensions;
-  // std::vector<std::unique_ptr<Node>> roots;
-  std::queue<Pos> q;
-  q.push(Pos(0, 0));
 
-  char c = '\0';
-  int area = 0;
-  int perimeter = 0;
+  for(size_t j = 0; j < data.gardens.size(); ++j) {
+    for(size_t i = 0; i < data.gardens[0].size(); ++i) {
+      unvisited.insert({.x = i, .y = j});
+    }
+  }
 
   auto in_bounds = [&](const Pos& p) {
     return p.x >= 0 && p.y >= 0 && p.x < data.gardens[0].size() && p.y < data.gardens.size();
   };
 
-  while(q.size() > 0) {
-    Pos p = q.front();
-    visited.insert(p);
 
-    if (data.gardens[p.y][p.x] != c) {
-      if (area != 0 && perimeter != 0 && c != '\0') {
-        dimensions[c].push_back({area, perimeter});
-      }
-      area = 0;
-      perimeter = 0;
-      c = data.gardens[p.y][p.x];
-    }
-    area += 1;
-    for(auto dir: directions) {
-      Pos next = p + dir;
-      if (in_bounds(next)) {
-        if (data.gardens[next.y][next.x] != c) {
-          ++perimeter;
+  while (unvisited.size() > 0) {
+    Pos p = *unvisited.begin();
+    std::queue<Pos> q;
+
+    char target = data.gardens[p.y][p.x];
+    int area = 0;
+    int perimeter = 0;
+    q.push(p);
+
+    // floodfill
+    while(!q.empty()) {
+      Pos cur = q.front();
+      if (unvisited.contains(cur)) {
+        unvisited.erase(cur);
+        ++area;
+        for(auto dir: directions) {
+          Pos next = cur + dir;
+          if (in_bounds(next)) {
+            char next_char = data.gardens[next.y][next.x];
+            if (next_char == target) {
+              if (unvisited.contains(next)) {
+                q.push(next);
+              }
+            }
+            else {
+              ++perimeter;
+            }
+          }
+          else {
+            ++perimeter;
+          }
         }
-        if (!visited.contains(next)) {
-          q.push(p + dir);
-        }
       }
+      else {
+        // we've been here before
+        // but this node was added into the queue by another node
+      }
+      q.pop();
     }
-    q.pop();
+
+    dimensions[target].push_back({area, perimeter});
   }
 
-  for(auto& [key, dims] : dimensions) {
-    std::cout << key << ": " << dims.size() << std::endl;
-    // for(auto& dim : dims) {
-    //   std::cout << std::format("Area: {}, Perimeter: {} | ", dim.first, dim.second);
-    // }
-    // std::cout << std::endl;
+  int sum = 0;
+  for(auto& [key, val] : dimensions) {
+    for(auto& [area, perimeter]: val) {
+      sum += area * perimeter;
+      std::cout << std::format("{}: area {}, perimeter: {}\n", key, area, perimeter);
+    }
   }
 
-  return 0;
+  return sum;
 }
 
 int part2(const Data &data)
