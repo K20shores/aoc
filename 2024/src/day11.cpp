@@ -30,8 +30,7 @@ Node *get_node(uint64_t new_value, std::map<uint64_t, std::unique_ptr<Node>> &sp
   return splits[new_value].get();
 }
 
-uint64_t part1(const Data &data)
-{
+uint64_t count_stones(int blinks, const Data& data) {
   std::map<uint64_t, std::unique_ptr<Node>> splits;
   uint64_t sum = 0;
 
@@ -41,7 +40,6 @@ uint64_t part1(const Data &data)
     std::queue<std::pair<uint64_t, uint64_t>> q;
     q.push({stone, 0});
     sum += 1;
-    uint64_t n_steps = 25;
 
     while (!q.empty())
     {
@@ -49,9 +47,9 @@ uint64_t part1(const Data &data)
       Node *cur = get_node(val.first, splits);
 
 
-      for (size_t blink = val.second; blink < n_steps; ++blink)
+      for (size_t blink = val.second; blink < blinks; ++blink)
       {
-        while (cur->left != nullptr && blink < n_steps)
+        while (cur->left != nullptr && blink < blinks)
         {
           if (cur->right != nullptr)
           {
@@ -61,7 +59,7 @@ uint64_t part1(const Data &data)
           ++blink;
           cur = cur->left;
         }
-        if (blink >= n_steps)
+        if (blink >= blinks)
           break;
         uint64_t num_digits = std::floor(std::log10(cur->value)) + 1;
         if (cur->value == 0)
@@ -96,9 +94,14 @@ uint64_t part1(const Data &data)
   return sum;
 }
 
-int part2(const Data &data)
+uint64_t part1(const Data &data)
 {
-  return 0;
+  return count_stones(25, data);
+}
+
+uint64_t part2(const Data &data)
+{
+  return count_stones(75, data);
 }
 
 Data parse()
@@ -143,7 +146,7 @@ BENCHMARK_DEFINE_F(BenchmarkFixture, Part2Benchmark)
 {
   for (auto _ : state)
   {
-    int s = part2(data);
+    uint64_t s = part2(data);
     benchmark::DoNotOptimize(s);
   }
 }
@@ -155,8 +158,8 @@ int main(int argc, char **argv)
 {
   Data data = parse();
 
-  uint64_t answer1 = 0;
-  int answer2 = 0;
+  uint64_t answer1 = 198089;
+  uint64_t answer2 = 0;
 
   auto first = part1(data);
   std::cout << "Part 1: " << first << std::endl;
