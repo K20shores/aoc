@@ -71,7 +71,7 @@ std::map<char, std::vector<Dimensions>> floodfill(const Data& data) {
     }
   }
 
-  while (unvisited.size() > 0)
+  while (!unvisited.empty())
   {
     Pos p = *unvisited.begin();
     std::queue<Pos> q;
@@ -96,17 +96,11 @@ std::map<char, std::vector<Dimensions>> floodfill(const Data& data) {
           q.push(cur + dir);
         }
       }
-      else
-      {
-        // we've been here before
-        // but this node was added into the queue by another node
-      }
       q.pop();
     }
 
     dimensions[target].push_back(d);
   }
-
 
   return dimensions;
 }
