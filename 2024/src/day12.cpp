@@ -47,32 +47,15 @@ int part1(const Data &data)
     while (!q.empty())
     {
       Pos cur = q.front();
-      if (unvisited.contains(cur))
-      {
+      if (!in_bounds(data, cur) || data.gardens[cur.y][cur.x] != target) {
+        ++perimeter;
+      }
+      else if (unvisited.contains(cur)) {
         unvisited.erase(cur);
         ++area;
         for (auto dir : directions)
         {
-          Pos next = cur + dir;
-          if (in_bounds(data, next))
-          {
-            char next_char = data.gardens[next.y][next.x];
-            if (next_char == target)
-            {
-              if (unvisited.contains(next))
-              {
-                q.push(next);
-              }
-            }
-            else
-            {
-              ++perimeter;
-            }
-          }
-          else
-          {
-            ++perimeter;
-          }
+          q.push(cur + dir);
         }
       }
       else
@@ -157,25 +140,13 @@ int part2(const Data &data)
     while (!q.empty())
     {
       Pos cur = q.front();
-      if (unvisited.contains(cur))
-      {
+      if (in_bounds(data, cur) && data.gardens[cur.y][cur.x] == target && unvisited.contains(cur)) {
         unvisited.erase(cur);
         ++area;
         sides += count_corners(data, cur);
         for (auto dir : directions)
         {
-          Pos next = cur + dir;
-          if (in_bounds(data, next))
-          {
-            char next_char = data.gardens[next.y][next.x];
-            if (next_char == target)
-            {
-              if (unvisited.contains(next))
-              {
-                q.push(next);
-              }
-            }
-          }
+          q.push(cur + dir);
         }
       }
       else
