@@ -195,7 +195,6 @@ int part2(const Data &data)
     for (auto &[area, sides] : val)
     {
       sum += area * sides;
-      std::cout << std::format("{}: area {}, sides: {}\n", key, area, sides);
     }
   }
 
@@ -255,8 +254,8 @@ int main(int argc, char **argv)
 {
   Data data = parse();
 
-  int answer1 = 0;
-  int answer2 = 0;
+  int answer1 = 1396298;
+  int answer2 = 853588;
 
   auto first = part1(data);
   std::cout << "Part 1: " << first << std::endl;
