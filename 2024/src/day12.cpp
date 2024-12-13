@@ -20,66 +20,11 @@ bool in_bounds(const Data &data, const Pos &p)
   return p.x >= 0 && p.y >= 0 && p.x < data.gardens[0].size() && p.y < data.gardens.size();
 };
 
-int part1(const Data &data)
-{
-  std::set<Pos> unvisited;
-  std::map<char, std::vector<std::pair<int, int>>> dimensions;
-
-  for (size_t j = 0; j < data.gardens.size(); ++j)
-  {
-    for (size_t i = 0; i < data.gardens[0].size(); ++i)
-    {
-      unvisited.insert({.x = i, .y = j});
-    }
-  }
-
-  while (unvisited.size() > 0)
-  {
-    Pos p = *unvisited.begin();
-    std::queue<Pos> q;
-
-    char target = data.gardens[p.y][p.x];
-    int area = 0;
-    int perimeter = 0;
-    q.push(p);
-
-    // floodfill
-    while (!q.empty())
-    {
-      Pos cur = q.front();
-      if (!in_bounds(data, cur) || data.gardens[cur.y][cur.x] != target) {
-        ++perimeter;
-      }
-      else if (unvisited.contains(cur)) {
-        unvisited.erase(cur);
-        ++area;
-        for (auto dir : directions)
-        {
-          q.push(cur + dir);
-        }
-      }
-      else
-      {
-        // we've been here before
-        // but this node was added into the queue by another node
-      }
-      q.pop();
-    }
-
-    dimensions[target].push_back({area, perimeter});
-  }
-
-  int sum = 0;
-  for (auto &[key, val] : dimensions)
-  {
-    for (auto &[area, perimeter] : val)
-    {
-      sum += area * perimeter;
-    }
-  }
-
-  return sum;
-}
+struct Dimensions {
+  int area;
+  int perimeter;
+  int sides;
+};
 
 int count_corners(const Data &data, Pos cur)
 {
@@ -113,10 +58,10 @@ int count_corners(const Data &data, Pos cur)
   return cornes;
 }
 
-int part2(const Data &data)
-{
+
+std::map<char, std::vector<Dimensions>> floodfill(const Data& data) {
   std::set<Pos> unvisited;
-  std::map<char, std::vector<std::pair<int, int>>> dimensions;
+  std::map<char, std::vector<Dimensions>> dimensions;
 
   for (size_t j = 0; j < data.gardens.size(); ++j)
   {
@@ -132,18 +77,20 @@ int part2(const Data &data)
     std::queue<Pos> q;
 
     char target = data.gardens[p.y][p.x];
-    int area = 0;
-    int sides = 0;
+    Dimensions d{.area = 0, .perimeter = 0, .sides = 0};
     q.push(p);
 
     // floodfill
     while (!q.empty())
     {
       Pos cur = q.front();
-      if (in_bounds(data, cur) && data.gardens[cur.y][cur.x] == target && unvisited.contains(cur)) {
+      if (!in_bounds(data, cur) || data.gardens[cur.y][cur.x] != target) {
+        ++d.perimeter;
+      }
+      else if (unvisited.contains(cur)) {
         unvisited.erase(cur);
-        ++area;
-        sides += count_corners(data, cur);
+        ++d.area;
+        d.sides += count_corners(data, cur);
         for (auto dir : directions)
         {
           q.push(cur + dir);
@@ -157,18 +104,38 @@ int part2(const Data &data)
       q.pop();
     }
 
-    dimensions[target].push_back({area, sides});
+    dimensions[target].push_back(d);
   }
 
+
+  return dimensions;
+}
+
+int part1(const Data &data)
+{
+  auto dimensions = floodfill(data);
   int sum = 0;
   for (auto &[key, val] : dimensions)
   {
-    for (auto &[area, sides] : val)
+    for (auto &d : val)
     {
-      sum += area * sides;
+      sum += d.area * d.perimeter;
     }
   }
+  return sum;
+}
 
+int part2(const Data &data)
+{
+  auto dimensions = floodfill(data);
+  int sum = 0;
+  for (auto &[key, val] : dimensions)
+  {
+    for (auto &d : val)
+    {
+      sum += d.area * d.sides;
+    }
+  }
   return sum;
 }
 
