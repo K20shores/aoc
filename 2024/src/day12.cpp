@@ -40,7 +40,7 @@ int count_corners(const Data &data, Pos cur)
   bool w = same(cur+W);
   bool nw = same(cur+NW);
 
-  // convex corners, or an L shaped region where the current characters
+  // convex corners, or an L shaped region where a cell is the same as two of it's orthogonal neighbors 
   // AX XA  A  A
   //  A A  AX  AX 
   // concave corners, or when a cell is the same as its two orthongal neighbors but not the same
