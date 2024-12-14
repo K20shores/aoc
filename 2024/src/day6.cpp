@@ -7,6 +7,8 @@
 #include <tuple>
 #include <unordered_set>
 #include <aoc/2024/pos.h>
+#include <thread>
+#include <mutex>
 
 struct Data
 {
@@ -62,16 +64,15 @@ int part2(const Data &data)
 {
   int cycles = 0;
   auto path = data.path;
+  std::mutex mtx;
 
-  for (const auto &obstacle : path)
-  {
+  auto process_obstacle = [&](const Pos &obstacle) {
     std::unordered_set<std::pair<Pos, Pos>, PosPairHash> visited;
-
     Pos p = data.p;
     Pos dir = data.dir;
 
     if (obstacle == p)
-      continue; // ignore the starting location
+      return; // ignore the starting location
     while (true)
     {
       if (visited.find({p, dir}) == visited.end())
@@ -81,6 +82,7 @@ int part2(const Data &data)
       }
       else
       {
+        std::lock_guard<std::mutex> lock(mtx);
         cycles += 1;
         break;
       }
@@ -94,6 +96,17 @@ int part2(const Data &data)
       }
       p += dir;
     }
+  };
+
+  std::vector<std::thread> threads;
+  for (const auto &obstacle : path)
+  {
+    threads.emplace_back(process_obstacle, obstacle);
+  }
+
+  for (auto &thread : threads)
+  {
+    thread.join();
   }
 
   return cycles;

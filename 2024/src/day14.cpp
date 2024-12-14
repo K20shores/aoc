@@ -85,7 +85,7 @@ int part2(const Data &data)
     }
   }
   robots = data.robots;
-  iterate(robots, min_t +1, width, height);
+  iterate(robots, min_t + 1, width, height);
   std::vector<std::string> grid(height, std::string(width, '.'));
   for (auto &[px, py, _, __] : robots)
   {
@@ -157,7 +157,7 @@ int main(int argc, char **argv)
   Data data = parse();
 
   int64_t answer1 = 225552000;
-  int64_t answer2 = 0;
+  int64_t answer2 = 7371;
 
   auto first = part1(data);
   std::cout << "Part 1: " << first << std::endl;
