@@ -63,9 +63,9 @@ std::map<char, std::vector<Dimensions>> floodfill(const Data& data) {
   std::set<Pos> unvisited;
   std::map<char, std::vector<Dimensions>> dimensions;
 
-  for (size_t j = 0; j < data.gardens.size(); ++j)
+  for (int64_t j = 0; j < data.gardens.size(); ++j)
   {
-    for (size_t i = 0; i < data.gardens[0].size(); ++i)
+    for (int64_t i = 0; i < data.gardens[0].size(); ++i)
     {
       unvisited.insert({.x = i, .y = j});
     }

@@ -14,22 +14,59 @@ struct Data
 
 int part1(const Data &data)
 {
+  auto determinant = [&](int a1, int a2, int b1, int b2) {
+    return a1 * b2 - a2 * b1;
+  };
+
+  int sum = 0;
   for(auto& claw: data.data) {
     int a1 = claw[0];
     int a2 = claw[1];
     int b1 = claw[2];
     int b2 = claw[3];
-    int prize1 = claw[4];
-    int prize2 = claw[5];
+    int x = claw[4];
+    int y = claw[5];
 
-    int m = 0;
-    int n = 0;
+    int det = determinant(a1, a2, b1, b2);
+
+    int m_top = b2*x - b1*y;
+    int n_top = a1*y - a2*x;
+    if (det != 0 && m_top % det == 0 && n_top % det == 0) {
+      int m = (b2*x - b1*y) / det;
+      int n = (a1*y - a2*x) / det;
+      sum += 3*m + n;
+    }
   }
+  return sum;
 }
 
-int part2(const Data &data)
+int64_t part2(const Data &data)
 {
-  return 0;
+  auto determinant = [&](int a1, int a2, int b1, int b2) {
+    return a1 * b2 - a2 * b1;
+  };
+
+  int64_t sum = 0;
+  for(auto& claw: data.data) {
+    int64_t a1 = claw[0];
+    int64_t a2 = claw[1];
+    int64_t b1 = claw[2];
+    int64_t b2 = claw[3];
+    int64_t x = claw[4] + 10000000000000;
+    int64_t y = claw[5] + 10000000000000;
+
+    int64_t det = determinant(a1, a2, b1, b2);
+
+    int64_t m_top = b2*x - b1*y;
+    int64_t n_top = a1*y - a2*x;
+    if (det != 0 && m_top % det == 0 && n_top % det == 0) {
+      int64_t m = (b2*x - b1*y) / det;
+      int64_t n = (a1*y - a2*x) / det;
+      sum += 3*m + n;
+    }
+  }
+  return sum;
+
 }
 
 Data parse()
@@ -99,7 +136,7 @@ BENCHMARK_DEFINE_F(BenchmarkFixture, Part2Benchmark)
 {
   for (auto _ : state)
   {
-    int s = part2(data);
+    int64_t s = part2(data);
     benchmark::DoNotOptimize(s);
   }
 }
@@ -111,8 +148,8 @@ int main(int argc, char **argv)
 {
   Data data = parse();
 
-  int answer1 = 0;
-  int answer2 = 0;
+  int answer1 = 36870;
+  int64_t answer2 = 0;
 
   auto first = part1(data);
   std::cout << "Part 1: " << first << std::endl;
