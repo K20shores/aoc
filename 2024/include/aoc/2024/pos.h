@@ -11,6 +11,12 @@ struct Pos
     return {.x = this->x + other.x, .y = this->y + other.y};
   }
 
+  Pos operator-(const Pos &other)
+  {
+    return {.x = this->x - other.x, .y = this->y - other.y};
+  }
+
+
   Pos &operator+=(const Pos &other)
   {
     this->x += other.x;
@@ -18,14 +24,21 @@ struct Pos
     return *this;
   }
 
-  Pos operator-(const Pos &other)
+  Pos &operator-=(const Pos &other)
   {
-    return {.x = this->x - other.x, .y = this->y - other.y};
+    this->x -= other.x;
+    this->y -= other.y;
+    return *this;
   }
 
   bool operator==(const Pos &other) const
   {
     return this->x == other.x && this->y == other.y;
+  }
+
+  bool operator!=(const Pos &other) const
+  {
+    return this->x != other.x || this->y != other.y;
   }
 
   bool operator<(const Pos &other) const
