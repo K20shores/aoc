@@ -6,12 +6,12 @@ struct Pos
   int64_t x = 0;
   int64_t y = 0;
 
-  Pos operator+(const Pos other)
+  Pos operator+(const Pos other) const
   {
     return {.x = this->x + other.x, .y = this->y + other.y};
   }
 
-  Pos operator-(const Pos &other)
+  Pos operator-(const Pos &other) const
   {
     return {.x = this->x - other.x, .y = this->y - other.y};
   }
