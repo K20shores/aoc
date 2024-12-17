@@ -37,7 +37,6 @@ std::pair<int64_t, int64_t> djikstra(const Data &data)
   int64_t height = data.grid.size();
   std::priority_queue<std::pair<int64_t, State>, std::vector<std::pair<int64_t, State>>, std::greater<>> pq;
   std::map<State, int64_t> dist;
-  // std::map<State, State> prev;
   std::map<State, std::vector<State>> prev;
   std::set<State> visited;
 
