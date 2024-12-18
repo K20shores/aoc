@@ -29,7 +29,7 @@ struct State {
     }
 };
 
-std::pair<int64_t, int64_t> djikstra(const Data& data, int64_t width, int64_t height, int64_t limit)
+int64_t djikstra(const Data& data, int64_t width, int64_t height, int64_t limit)
 {
   std::set<Pos> occupied;
   for(size_t i = 0; i < limit; ++i) {
@@ -43,7 +43,6 @@ std::pair<int64_t, int64_t> djikstra(const Data& data, int64_t width, int64_t he
   State start = State{.pos = data.start, .dir = E};
   pq.emplace(0, start);
   dist[start] = 0;
-  State end_state;
 
   int64_t distance = 0;
   while (!pq.empty()) {
@@ -54,7 +53,6 @@ std::pair<int64_t, int64_t> djikstra(const Data& data, int64_t width, int64_t he
     visited.insert(u);
 
     if (u.pos == data.end) {
-      end_state = u;
       distance = cur_dist;
       break;
     }
@@ -78,34 +76,7 @@ std::pair<int64_t, int64_t> djikstra(const Data& data, int64_t width, int64_t he
     }
   }
 
-
-  std::vector<std::string> grid(height, std::string(width, '.'));
-
-  std::vector<State> stack;
-  stack.push_back(end_state);
-  std::set<Pos> visited_pos;
-  while (stack.size() != 0 && stack[0].pos != data.start) {
-    visited_pos.insert(stack.back().pos);
-    auto cur = stack.back();
-    grid[cur.pos.y][cur.pos.x] = 'O';
-    stack.pop_back();
-    stack.push_back(prev[cur][0]);
-    // for(auto& prev_state : prev[cur]) {
-    //   stack.push_back(prev_state);
-    // }
-  }
-  grid[data.start.y][data.start.x] = 'O';
-
-  for(size_t i = 0; i < limit; ++i) {
-    grid[data.positions[i].y][data.positions[i].x] = '#';
-  }
-
-  for(auto& row : grid) {
-    std::cout << row << std::endl;
-  }
-  std::cout << std::endl;
-
-  return {distance, visited_pos.size()};
+  return distance;
 }
 
 int part1(const Data &data)
@@ -115,13 +86,33 @@ int part1(const Data &data)
   int64_t height = 71;
   copy.start = Pos{.x = 0, .y = 0};
   copy.end = Pos{.x = width - 1, .y = height - 1};
-  auto [distance, visited] = djikstra(copy, width, height, 1024);
+  auto distance = djikstra(copy, width, height, 1024);
   return distance;
 }
 
-int part2(const Data &data)
+std::string part2(const Data &data)
 {
-  return 0;
+  auto copy = data;
+  int64_t width = 71;
+  int64_t height = 71;
+  copy.start = Pos{.x = 0, .y = 0};
+  copy.end = Pos{.x = width - 1, .y = height - 1};
+
+  int left = 0;
+  int right = data.positions.size();
+  while (left <= right) {
+    int m = std::floor((left + right) / 2);
+    auto distance = djikstra(copy, width, height, m);
+    if (distance > 0) {
+      left = m + 1;
+    }
+    else if (distance == 0) {
+      right = m - 1;
+    }
+  }
+  std::string position = "";
+  position += std::format("{},{}", data.positions[right].x, data.positions[right].y);
+  return position;
 }
 
 Data parse()
@@ -178,8 +169,8 @@ int main(int argc, char **argv)
 {
   Data data = parse();
 
-  int answer1 = 0;
-  int answer2 = 0;
+  int answer1 = 296;
+  std::string answer2 = "28,44";
 
   auto first = part1(data);
   std::cout << "Part 1: " << first << std::endl;
