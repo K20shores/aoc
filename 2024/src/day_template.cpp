@@ -50,7 +50,7 @@ BENCHMARK_DEFINE_F(BenchmarkFixture, Part1Benchmark)
 {
   for (auto _ : state)
   {
-    int s = part1(data);
+    auto s = part1(data);
     benchmark::DoNotOptimize(s);
   }
 }
@@ -60,7 +60,7 @@ BENCHMARK_DEFINE_F(BenchmarkFixture, Part2Benchmark)
 {
   for (auto _ : state)
   {
-    int s = part2(data);
+    auto s = part2(data);
     benchmark::DoNotOptimize(s);
   }
 }

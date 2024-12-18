@@ -9,14 +9,13 @@
 #include <algorithm>
 
 struct Data {
-  int A;
-  int B;
-  int C;
+  int64_t A;
+  int64_t B;
+  int64_t C;
   std::vector<int> instructions;
 };
 
-int part1(const Data &data)
-{
+std::vector<int> run_program(const Data& data) {
   // Combo ops 
   // 0,1,2,3 -> 0,1,2,3
   // 4 -> A
@@ -35,15 +34,15 @@ int part1(const Data &data)
   // 7 (cdv) -> division | A / pow(2,combo) stored in C
 
   int instruction_pointer = 0;
-  int A = data.A;
-  int B = data.B;
-  int C = data.C;
+  int64_t A = data.A;
+  int64_t B = data.B;
+  int64_t C = data.C;
   std::vector<int> output;
 
   while (instruction_pointer < data.instructions.size()-1) {
     int opcode = data.instructions[instruction_pointer];
-    int literal = data.instructions[instruction_pointer + 1];
-    int combo = literal;
+    int64_t literal = data.instructions[instruction_pointer + 1];
+    int64_t combo = literal;
     if (combo == 4) {
       combo = A;
     }
@@ -92,11 +91,14 @@ int part1(const Data &data)
     }
   }
 
-  std::cout << "A: " << A << std::endl;
-  std::cout << "B: " << B << std::endl;
-  std::cout << "C: " << C << std::endl;
+  // std::cout << "A: " << A << std::endl;
+  // std::cout << "B: " << B << std::endl;
+  // std::cout << "C: " << C << std::endl;
 
-  // join the output with commas
+  return output;
+}
+
+std::string get_output(std::vector<int> output) {
   std::string out = "";
   for (int i = 0; i < output.size(); ++i) {
     out += std::to_string(output[i]);
@@ -104,14 +106,47 @@ int part1(const Data &data)
       out += ",";
     }
   }
-  std::cout << out << std::endl;
+  return out;
+}
 
+std::string part1(const Data &data)
+{
+  return get_output(run_program(data));
+}
+
+int64_t check(Data data, int64_t A) {
+  for(int64_t i = 0; i < 8; ++i) {
+    data.A = A + i;
+    data.B = 0;
+    data.C = 0;
+    auto output = run_program(data);
+    bool matches = true;
+    for(size_t j = 0; j < output.size(); ++j) {
+      if (output[j] != data.instructions[data.instructions.size()-output.size() + j]) {
+        matches = false;
+        break;
+      }
+    }
+    if (matches) {
+      if (output.size() == data.instructions.size()) {
+        return data.A;
+      }
+      int64_t next = data.A*8;
+      if (data.A == 0) {
+        next = 8;
+      }
+      int64_t result = check(data, next);
+      if (result != 0) {
+        return result;
+      }
+    }
+  }
   return 0;
 }
 
-int part2(const Data &data)
+int64_t part2(const Data &data)
 {
-  return 0;
+  return check(data, 0);
 }
 
 Data parse()
@@ -128,15 +163,15 @@ Data parse()
   {
     if (line.find("Register A:") != std::string::npos)
     {
-      data.A = std::stoi(line.substr(line.find(":") + 1));
+      data.A = std::stoll(line.substr(line.find(":") + 1));
     }
     else if (line.find("Register B:") != std::string::npos)
     {
-      data.B = std::stoi(line.substr(line.find(":") + 1));
+      data.B = std::stoll(line.substr(line.find(":") + 1));
     }
     else if (line.find("Register C:") != std::string::npos)
     {
-      data.C = std::stoi(line.substr(line.find(":") + 1));
+      data.C = std::stoll(line.substr(line.find(":") + 1));
     }
     else if (line.find("Program:") != std::string::npos)
     {
@@ -161,7 +196,7 @@ BENCHMARK_DEFINE_F(BenchmarkFixture, Part1Benchmark)
 {
   for (auto _ : state)
   {
-    int s = part1(data);
+    auto s = part1(data);
     benchmark::DoNotOptimize(s);
   }
 }
@@ -171,7 +206,7 @@ BENCHMARK_DEFINE_F(BenchmarkFixture, Part2Benchmark)
 {
   for (auto _ : state)
   {
-    int s = part2(data);
+    int64_t s = part2(data);
     benchmark::DoNotOptimize(s);
   }
 }
@@ -183,8 +218,8 @@ int main(int argc, char **argv)
 {
   Data data = parse();
 
-  int answer1 = 0;
-  int answer2 = 0;
+  std::string answer1 = "3,6,3,7,0,7,0,3,0";
+  int64_t answer2 = 136904920099226;
 
   auto first = part1(data);
   std::cout << "Part 1: " << first << std::endl;
