@@ -6,19 +6,19 @@
 #include <benchmark/benchmark.h>
 #include <format>
 #include <aoc/2024/pos.h>
-#include <queue>
+#include <aoc/2024/split.h>
 #include <map>
 #include <set>
 
 struct Data {
+  std::vector<Pos> positions;
   Pos start;
   Pos end;
-  std::vector<std::string> grid;
 };
 
-bool in_bounds(const Pos &pos, const Data &data)
+bool in_bounds(const Pos &pos, int width, int height)
 {
-  return pos.x >= 0 && pos.x < data.grid[0].size() && pos.y >= 0 && pos.y < data.grid.size();
+  return pos.x >= 0 && pos.x < width && pos.y >= 0 && pos.y < height;
 }
 
 struct State {
@@ -29,10 +29,12 @@ struct State {
     }
 };
 
-std::pair<int64_t, int64_t> djikstra(const Data &data)
+std::pair<int64_t, int64_t> djikstra(const Data& data, int64_t width, int64_t height, int64_t limit)
 {
-  int64_t width = data.grid[0].size();
-  int64_t height = data.grid.size();
+  std::set<Pos> occupied;
+  for(size_t i = 0; i < limit; ++i) {
+    occupied.insert(data.positions[i]);
+  }
   std::priority_queue<std::pair<int64_t, State>, std::vector<std::pair<int64_t, State>>, std::greater<>> pq;
   std::map<State, int64_t> dist;
   std::map<State, std::vector<State>> prev;
@@ -60,16 +62,11 @@ std::pair<int64_t, int64_t> djikstra(const Data &data)
     for(auto& new_dir : directions) {
       State v = {.pos = u.pos + new_dir, .dir = new_dir};
 
-      if (!in_bounds(v.pos, data) || visited.contains(v) || data.grid[v.pos.y][v.pos.x] == '#') {
+      if (!in_bounds(v.pos, width, height) || visited.contains(v) || occupied.contains(v.pos)) {
         continue;
       }
 
-      int64_t new_dist = cur_dist;
-      if (new_dir != u.dir) {
-        new_dist += 1001;
-      } else {
-        new_dist += 1;
-      }
+      int64_t new_dist = cur_dist + 1;
       if (!dist.contains(v) || new_dist < dist[v]) {
         dist[v] = new_dist;
         prev[v] = {u};
@@ -81,37 +78,55 @@ std::pair<int64_t, int64_t> djikstra(const Data &data)
     }
   }
 
+
+  std::vector<std::string> grid(height, std::string(width, '.'));
+
   std::vector<State> stack;
   stack.push_back(end_state);
   std::set<Pos> visited_pos;
   while (stack.size() != 0 && stack[0].pos != data.start) {
     visited_pos.insert(stack.back().pos);
     auto cur = stack.back();
+    grid[cur.pos.y][cur.pos.x] = 'O';
     stack.pop_back();
-    for(auto& prev_state : prev[cur]) {
-      stack.push_back(prev_state);
-    }
+    stack.push_back(prev[cur][0]);
+    // for(auto& prev_state : prev[cur]) {
+    //   stack.push_back(prev_state);
+    // }
   }
+  grid[data.start.y][data.start.x] = 'O';
+
+  for(size_t i = 0; i < limit; ++i) {
+    grid[data.positions[i].y][data.positions[i].x] = '#';
+  }
+
+  for(auto& row : grid) {
+    std::cout << row << std::endl;
+  }
+  std::cout << std::endl;
 
   return {distance, visited_pos.size()};
 }
 
 int part1(const Data &data)
 {
-  auto [distance, count] = djikstra(data);
+  auto copy = data;
+  int64_t width = 71;
+  int64_t height = 71;
+  copy.start = Pos{.x = 0, .y = 0};
+  copy.end = Pos{.x = width - 1, .y = height - 1};
+  auto [distance, visited] = djikstra(copy, width, height, 1024);
   return distance;
 }
 
-
 int part2(const Data &data)
 {
-  auto [distance, count] = djikstra(data);
-  return count;
+  return 0;
 }
 
 Data parse()
 {
-  std::ifstream file(std::filesystem::path("inputs/day16.txt"));
+  std::ifstream file(std::filesystem::path("inputs/day18.txt"));
   if (!file.is_open())
   {
     throw std::runtime_error("file not found");
@@ -119,21 +134,10 @@ Data parse()
   std::string line;
   Data data;
 
-  int64_t j = 0;
   while (std::getline(file, line))
   {
-    data.grid.push_back(line);
-    auto E = line.find("E");
-    auto S = line.find("S");
-    if (E != std::string::npos)
-    {
-      data.end = Pos{.x = static_cast<int64_t>(E), .y = j};
-    }
-    if (S != std::string::npos)
-    {
-      data.start = Pos{.x = static_cast<int64_t>(S), .y = j};
-    }
-    ++j;
+    auto location = split_to_int(line, ",");
+    data.positions.push_back(Pos{.x = location[0], .y = location[1]});
   }
 
   return data;
@@ -152,7 +156,7 @@ BENCHMARK_DEFINE_F(BenchmarkFixture, Part1Benchmark)
 {
   for (auto _ : state)
   {
-    int s = part1(data);
+    auto s = part1(data);
     benchmark::DoNotOptimize(s);
   }
 }
@@ -162,7 +166,7 @@ BENCHMARK_DEFINE_F(BenchmarkFixture, Part2Benchmark)
 {
   for (auto _ : state)
   {
-    int s = part2(data);
+    auto s = part2(data);
     benchmark::DoNotOptimize(s);
   }
 }
@@ -174,8 +178,8 @@ int main(int argc, char **argv)
 {
   Data data = parse();
 
-  int answer1 = 133584;
-  int answer2 = 622;
+  int answer1 = 0;
+  int answer2 = 0;
 
   auto first = part1(data);
   std::cout << "Part 1: " << first << std::endl;
