@@ -14,32 +14,6 @@ struct Data
   std::vector<std::string> designs;
 };
 
-bool check_design(std::string_view design, const Trie &t, std::unordered_map<std::string_view, bool> &cache)
-{
-  if (design.empty())
-  {
-    return true;
-  }
-
-  if (cache.count(design))
-  {
-    return cache[design];
-  }
-
-  std::vector<int> match = t.search(design);
-  for (auto m : match)
-  {
-    if (check_design(design.substr(m), t, cache))
-    {
-      cache[design] = true;
-      return true;
-    }
-  }
-
-  cache[design] = false;
-  return false;
-}
-
 int64_t count_ways(std::string_view design, const Trie &t, std::unordered_map<std::string_view, int64_t> &cache)
 {
   if (design.empty())
@@ -66,7 +40,7 @@ int64_t count_ways(std::string_view design, const Trie &t, std::unordered_map<st
 int part1(const Data &data)
 {
   Trie t;
-  std::unordered_map<std::string_view, bool> cache;
+  std::unordered_map<std::string_view, int64_t> cache;
   for (const auto &pattern : data.patterns)
   {
     t.insert(pattern);
@@ -75,10 +49,7 @@ int part1(const Data &data)
   int possible = 0;
   for (auto &design : data.designs)
   {
-    if (check_design(design, t, cache))
-    {
-      ++possible;
-    }
+    possible += count_ways(design, t, cache) > 0 ? 1 : 0;
   }
   return possible;
 }
