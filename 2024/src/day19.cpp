@@ -8,51 +8,98 @@
 #include <aoc/2024/split.h>
 #include <aoc/2024/trie.h>
 
-struct Data {
+struct Data
+{
   std::vector<std::string> patterns;
   std::vector<std::string> designs;
 };
 
-bool check_design(std::string_view design, const Trie& t, std::unordered_map<std::string_view, bool>& memo) {
-    if (design.empty()) {
-        return true; // If we matched the whole design, it's valid.
-    }
+bool check_design(std::string_view design, const Trie &t, std::unordered_map<std::string_view, bool> &cache)
+{
+  if (design.empty())
+  {
+    return true;
+  }
 
-    if (memo.count(design)) {
-        return memo[design]; // Return cached result.
-    }
+  if (cache.count(design))
+  {
+    return cache[design];
+  }
 
-    // Get all matching prefixes for the current design.
-    std::vector<int> match = t.search(design);
-    for (auto m : match) {
-        if (check_design(design.substr(m), t, memo)) {
-            return memo[design] = true; // Cache and return success.
-        }
+  std::vector<int> match = t.search(design);
+  for (auto m : match)
+  {
+    if (check_design(design.substr(m), t, cache))
+    {
+      cache[design] = true;
+      return true;
     }
+  }
 
-    return memo[design] = false; // Cache and return failure.
+  cache[design] = false;
+  return false;
+}
+
+int64_t count_ways(std::string_view design, const Trie &t, std::unordered_map<std::string_view, int64_t> &cache)
+{
+  if (design.empty())
+  {
+    return 1;
+  }
+
+  if (cache.count(design))
+  {
+    return cache[design];
+  }
+
+  // Get all matching prefixes for the current design.
+  std::vector<int> match = t.search(design);
+  cache[design] = 0;
+  for (auto m : match)
+  {
+    cache[design] += count_ways(design.substr(m), t, cache);
+  }
+
+  return cache[design];
 }
 
 int part1(const Data &data)
 {
   Trie t;
   std::unordered_map<std::string_view, bool> cache;
-  for(const auto& pattern : data.patterns) {
+  for (const auto &pattern : data.patterns)
+  {
     t.insert(pattern);
   }
 
   int possible = 0;
-  for(auto& design : data.designs) {
-    if (check_design(design, t, cache)) {
+  for (auto &design : data.designs)
+  {
+    if (check_design(design, t, cache))
+    {
       ++possible;
     }
   }
   return possible;
 }
 
-int part2(const Data &data)
+int64_t part2(const Data &data)
 {
-  return 0;
+  Trie t;
+  std::unordered_map<std::string_view, int64_t> cache;
+  for (const auto &pattern : data.patterns)
+  {
+    t.insert(pattern);
+  }
+
+  int64_t possible = 0;
+  for (auto &design : data.designs)
+  {
+    auto ways = count_ways(design, t, cache);
+    possible += ways;
+    // std::cout << std::format("Design: {}, Ways: {}\n", design, ways);
+  }
+  return possible;
 }
 
 Data parse()
@@ -73,10 +120,12 @@ Data parse()
       patterns = false;
       continue;
     }
-    if (patterns) {
+    if (patterns)
+    {
       data.patterns = split(line, ", ");
     }
-    else {
+    else
+    {
       data.designs.push_back(line);
     }
   }
@@ -119,20 +168,22 @@ int main(int argc, char **argv)
 {
   Data data = parse();
 
-  int answer1 = 0;
-  int answer2 = 0;
+  int answer1 = 367;
+  int64_t answer2 = 724388733465031;
 
   auto first = part1(data);
   std::cout << "Part 1: " << first << std::endl;
-  
+
   auto second = part2(data);
   std::cout << "Part 2: " << second << std::endl;
 
   first != answer1 ? throw std::runtime_error("Part 1 incorrect") : nullptr;
   second != answer2 ? throw std::runtime_error("Part 2 incorrect") : nullptr;
 
-  for (int i = 1; i < argc; ++i) {
-    if (std::string(argv[i]) == "--benchmark") {
+  for (int i = 1; i < argc; ++i)
+  {
+    if (std::string(argv[i]) == "--benchmark")
+    {
       benchmark::Initialize(&argc, argv);
       benchmark::RunSpecifiedBenchmarks();
       return 0;
