@@ -50,8 +50,14 @@ struct Pos
     return this->y < other.y;
   }
 
-  Pos operator*(const int& x) {
+  Pos operator*(const auto& x) {
     return {.x = this->x * x, .y = this->y * x};
+  }
+
+  Pos& operator*= (const int& x) {
+    this->x *= x;
+    this->y *= x;
+    return *this;
   }
 };
 
