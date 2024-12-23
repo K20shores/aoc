@@ -176,7 +176,7 @@ int main(int argc, char **argv)
   Data data = parse();
 
   int answer1 = 1311;
-  int answer2 = 0;
+  int answer2 = 961364;
 
   auto first = part1(data);
   std::cout << "Part 1: " << first << std::endl;
