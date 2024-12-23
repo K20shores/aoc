@@ -76,12 +76,14 @@ std::pair<Vertices, Edges> build_graph(const std::vector<std::string> &keypad)
 // between each pair of vertices and stored that in a map
 using Distances = std::map<Pos, std::map<Pos, int>>;
 using Paths = std::map<Pos, std::map<Pos, Pos>>;
+using DirectionChanges = Distances;
 
 std::pair<Distances, Paths> floyd_warshall(const std::pair<Vertices, Edges>& graph)
 {
   const auto& [vertices, edges] = graph;
   Distances dist;
   Paths prev;
+  DirectionChanges direction_changes;
 
   for (const auto &u : vertices)
   {
@@ -89,6 +91,7 @@ std::pair<Distances, Paths> floyd_warshall(const std::pair<Vertices, Edges>& gra
     {
       dist[u][v] = INT_MAX;
       prev[u][v] = Pos{.x = -1, .y = -1};
+      direction_changes[u][v] = 0;
     }
   }
 
@@ -98,9 +101,11 @@ std::pair<Distances, Paths> floyd_warshall(const std::pair<Vertices, Edges>& gra
     {
       dist[u][v] = 1;
       prev[u][v] = u;
+      direction_changes[u][v] = 0;
     }
     dist[u][u] = 0;
     prev[u][u] = u;
+    direction_changes[u][u] = 0;
   }
 
   for (const auto &k : vertices)
@@ -112,6 +117,10 @@ std::pair<Distances, Paths> floyd_warshall(const std::pair<Vertices, Edges>& gra
         auto &dik = dist[i][k];
         auto &dkj = dist[k][j];
         auto &dij = dist[i][j];
+
+        auto &dik_dir = direction_changes[i][k];
+        auto &dkj_dir = direction_changes[k][j];
+        auto &dij_dir = direction_changes[i][j];
         if (dik != INT_MAX && dkj != INT_MAX && dij > dik + dkj)
         {
           dij = dik + dkj;
@@ -124,7 +133,7 @@ std::pair<Distances, Paths> floyd_warshall(const std::pair<Vertices, Edges>& gra
   return {dist, prev};
 }
 
-std::vector<Pos> shortest_path1(const Pos &start, const Pos &end, const Paths &paths, const Distances &distances, std::vector<std::string> keypad)
+std::vector<Pos> shortest_path(const Pos &start, const Pos &end, const Paths &paths)
 {
   std::vector<Pos> path;
   Pos current = end;
@@ -138,63 +147,13 @@ std::vector<Pos> shortest_path1(const Pos &start, const Pos &end, const Paths &p
   return path;
 }
 
-// std::vector<Pos> shortest_path2(const Pos &start, const Pos &end, const Paths &paths, const Distances &distances, std::vector<std::string> keypad)
-// {
-//   std::vector<Pos> path;
-//   Pos current = end;
-
-//   Pos last_direction = {0, 0};
-
-//   while (current != start)
-//   {
-//     path.push_back(current);
-
-//     Pos next = paths.at(start).at(current);
-//     if (next != start)
-//     {
-//       Pos candidate_direction = current - next;
-
-//       // Check if the same-distance alternative exists with the same direction
-//       Pos alternative = current;
-//       bool found_alternative = false;
-
-//       // Iterate through potential neighbors of `current`
-//       for(auto& dir : directions)
-//       {
-//         Pos candidate_pos = current + dir;
-//         if (in_bounds(candidate_pos.x, candidate_pos.y, keypad) && keypad.at(candidate_pos.y).at(candidate_pos.x) != ' ' &&
-//             distances.at(start).at(candidate_pos) == distances.at(start).at(current))
-//         {
-//           alternative = candidate_pos;
-//           found_alternative = true;
-//           break;
-//         }
-//       }
-
-//       if (found_alternative)
-//       {
-//         next = alternative;
-//       }
-
-//       // Update the last direction
-//       last_direction = candidate_direction;
-//     }
-
-//     current = next;
-//   }
-
-//   path.push_back(start);
-//   std::reverse(path.begin(), path.end());
-//   return path;
-// }
-
 std::string get_path(std::string path, const Paths& shortest_paths, const Distances& distances, std::vector<std::string> keypad, std::map<char, Pos> char_to_pos) {
   Pos start = char_to_pos['A'];
   std::string numeric_path;
   Pos current = start;
   for (char c : path) {
     Pos next = char_to_pos[c];
-    auto path = shortest_path1(current, next, shortest_paths, distances, keypad);
+    auto path = shortest_path(current, next, shortest_paths);
     for(size_t i = 0; i < path.size() - 1; ++i) {
       Pos dir = path[i + 1] - path[i];
       if (dir == up) {
