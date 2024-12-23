@@ -7,7 +7,6 @@
 #include <format>
 #include <unordered_map>
 #include <array>
-#include <set>
 
 // Specialization of std::hash for std::array<int, 4>
 namespace std
@@ -65,10 +64,10 @@ int64_t part1(const Data &data)
   return sum;
 }
 
-using Changes = std::unordered_map<std::array<int, 4>, int>;
+using Changes = std::unordered_map<std::array<int, 4>, int64_t>;
 int64_t part2(const Data &data)
 {
-  std::unordered_map<std::array<int, 4>, int64_t> global_sums;
+  Changes global_sums;
 
   for (size_t i = 0; i < data.values.size(); ++i)
   {
