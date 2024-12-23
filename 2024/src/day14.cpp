@@ -5,6 +5,7 @@
 #include <vector>
 #include <benchmark/benchmark.h>
 #include <format>
+#include <array>
 
 struct Data
 {

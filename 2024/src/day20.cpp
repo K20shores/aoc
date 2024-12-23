@@ -6,6 +6,7 @@
 #include <benchmark/benchmark.h>
 #include <format>
 #include <aoc/2024/pos.h>
+#include <queue>
 
 struct Data
 {

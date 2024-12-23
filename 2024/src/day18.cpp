@@ -9,6 +9,7 @@
 #include <aoc/2024/split.h>
 #include <map>
 #include <set>
+#include <queue>
 
 struct Data {
   std::vector<Pos> positions;
