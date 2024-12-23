@@ -8,6 +8,8 @@
 #include <aoc/2024/split.h>
 #include <stack>
 #include <tuple>
+#include <algorithm>
+#include <iterator>
 
 struct Node {
   std::string name;
@@ -77,13 +79,6 @@ int part1(const Data &data)
 {
   int sum = 0;
   auto cubed = cube(data.graph);
-  // std::cout << std::format("Triangles: {}\n", triangles(cubed));
-  // for(auto& i : cubed) {
-  //   for(auto j : i) {
-  //     std::cout << std::format("{:>3}", j);
-  //   }
-  //   std::cout << std::endl;
-  // }
   auto triangles = findTriangles(data.graph, cubed);
   for(auto& [i, j, k] : triangles) {
     bool has_t = data.nodes_by_id.at(i)->name_has_t || data.nodes_by_id.at(j)->name_has_t || data.nodes_by_id.at(k)->name_has_t;
@@ -92,9 +87,65 @@ int part1(const Data &data)
   return sum;
 }
 
-int part2(const Data &data)
-{
-  return 0;
+void maximal_clique(const Data& data, std::set<int>& R, std::set<int>& P, std::set<int>& X, std::vector<std::set<int>>& cliques) {
+  if (P.empty() && X.empty()) {
+    cliques.push_back(R);
+    return;
+  }
+  std::vector<int> P_copy(P.begin(), P.end());
+  for(int v : P_copy) {
+    std::set<int> next_r = R;
+    next_r.insert(v);
+
+    std::set<int> neighbors;
+    for(auto neighbor : data.nodes_by_id.at(v)->neighbors) {
+      neighbors.insert(neighbor->id);
+    }
+    std::set<int> next_p;
+    std::set_intersection(P.begin(), P.end(), neighbors.begin(), neighbors.end(),
+                 std::inserter(next_p, next_p.begin()));
+
+    std::set<int> next_x;
+    std::set_intersection(X.begin(), X.end(), neighbors.begin(), neighbors.end(),
+                 std::inserter(next_x, next_x.begin()));
+    
+    maximal_clique(data, next_r, next_p, next_x, cliques);
+
+    P.erase(v);
+    X.insert(v);
+  }
+}
+
+std::string part2(const Data &data){
+  std::set<int> P;
+  std::set<int> R;
+  std::set<int> X;
+  for(const auto& [id, node] : data.nodes_by_id) {
+    P.insert(id);
+  }
+  std::vector<std::set<int>> cliques;
+  maximal_clique(data, R, P, X, cliques);
+  int max = 0;
+  int id = 0;
+  for(int i = 0; i < cliques.size(); ++i) {
+    if (cliques[i].size() > max) {
+      max = cliques[i].size();
+      id = i;
+    }
+  }
+  std::vector<std::string> ids;
+  for(auto i : cliques[id]) {
+    ids.push_back(data.nodes_by_id.at(i)->name);
+  }
+  std::sort(ids.begin(), ids.end());
+  std::string result = "";
+  for(int i = 0; i < ids.size(); ++i) {
+    result += ids[i];
+    if (i != ids.size() - 1) {
+      result += ",";
+    }
+  }
+  return result;
 }
 
 Data parse()
@@ -183,8 +234,8 @@ int main(int argc, char **argv)
 {
   Data data = parse();
 
-  int answer1 = 0;
-  int answer2 = 0;
+  int answer1 = 926;
+  std::string answer2 = "az,ed,hz,it,ld,nh,pc,td,ty,ux,wc,yg,zz";
 
   auto first = part1(data);
   std::cout << "Part 1: " << first << std::endl;
