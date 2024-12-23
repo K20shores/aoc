@@ -87,9 +87,11 @@ int part1(const Data &data)
   return sum;
 }
 
-void maximal_clique(const Data& data, std::set<int>& R, std::set<int>& P, std::set<int>& X, std::vector<std::set<int>>& cliques) {
+void maximal_clique(const Data& data, std::set<int>& R, std::set<int>& P, std::set<int>& X, std::set<int>& cliques) {
   if (P.empty() && X.empty()) {
-    cliques.push_back(R);
+    if (R.size() > cliques.size()) {
+      cliques = R;
+    }
     return;
   }
   std::vector<int> P_copy(P.begin(), P.end());
@@ -123,18 +125,10 @@ std::string part2(const Data &data){
   for(const auto& [id, node] : data.nodes_by_id) {
     P.insert(id);
   }
-  std::vector<std::set<int>> cliques;
+  std::set<int> cliques;
   maximal_clique(data, R, P, X, cliques);
-  int max = 0;
-  int id = 0;
-  for(int i = 0; i < cliques.size(); ++i) {
-    if (cliques[i].size() > max) {
-      max = cliques[i].size();
-      id = i;
-    }
-  }
   std::vector<std::string> ids;
-  for(auto i : cliques[id]) {
+  for(auto i : cliques) {
     ids.push_back(data.nodes_by_id.at(i)->name);
   }
   std::sort(ids.begin(), ids.end());
