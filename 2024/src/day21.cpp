@@ -138,59 +138,55 @@ std::vector<Pos> shortest_path1(const Pos &start, const Pos &end, const Paths &p
   return path;
 }
 
-std::vector<Pos> shortest_path2(const Pos &start, const Pos &end, const Paths &paths, const Distances &distances, std::vector<std::string> keypad)
-{
-  std::vector<Pos> path;
-  Pos current = end;
+// std::vector<Pos> shortest_path2(const Pos &start, const Pos &end, const Paths &paths, const Distances &distances, std::vector<std::string> keypad)
+// {
+//   std::vector<Pos> path;
+//   Pos current = end;
 
-  Pos last_direction = {0, 0};
+//   Pos last_direction = {0, 0};
 
-  while (current != start)
-  {
-    path.push_back(current);
+//   while (current != start)
+//   {
+//     path.push_back(current);
 
-    Pos next = paths.at(start).at(current);
-    if (next != start)
-    {
-      Pos candidate_direction = current - next;
+//     Pos next = paths.at(start).at(current);
+//     if (next != start)
+//     {
+//       Pos candidate_direction = current - next;
 
-      // Check if the same-distance alternative exists with the same direction
-      Pos alternative = current;
-      bool found_alternative = false;
+//       // Check if the same-distance alternative exists with the same direction
+//       Pos alternative = current;
+//       bool found_alternative = false;
 
-      // Iterate through potential neighbors of `current`
-      for(auto& dir : directions)
-      {
-        if (dir == -1 * last_direction)
-        {
-          continue;
-        }
-        Pos candidate_pos = current + dir;
-        if (in_bounds(candidate_pos.x, candidate_pos.y, keypad) && keypad.at(candidate_pos.y).at(candidate_pos.x) != ' ' &&
-            distances.at(start).at(candidate_pos) == distances.at(start).at(current))
-        {
-          alternative = candidate_pos;
-          found_alternative = true;
-          break;
-        }
-      }
+//       // Iterate through potential neighbors of `current`
+//       for(auto& dir : directions)
+//       {
+//         Pos candidate_pos = current + dir;
+//         if (in_bounds(candidate_pos.x, candidate_pos.y, keypad) && keypad.at(candidate_pos.y).at(candidate_pos.x) != ' ' &&
+//             distances.at(start).at(candidate_pos) == distances.at(start).at(current))
+//         {
+//           alternative = candidate_pos;
+//           found_alternative = true;
+//           break;
+//         }
+//       }
 
-      if (found_alternative)
-      {
-        next = alternative;
-      }
+//       if (found_alternative)
+//       {
+//         next = alternative;
+//       }
 
-      // Update the last direction
-      last_direction = candidate_direction;
-    }
+//       // Update the last direction
+//       last_direction = candidate_direction;
+//     }
 
-    current = next;
-  }
+//     current = next;
+//   }
 
-  path.push_back(start);
-  std::reverse(path.begin(), path.end());
-  return path;
-}
+//   path.push_back(start);
+//   std::reverse(path.begin(), path.end());
+//   return path;
+// }
 
 std::string get_path(std::string path, const Paths& shortest_paths, const Distances& distances, std::vector<std::string> keypad, std::map<char, Pos> char_to_pos) {
   Pos start = char_to_pos['A'];
