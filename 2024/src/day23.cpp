@@ -15,10 +15,12 @@ struct Node {
   std::vector<Node *> neighbors;
   int id;
 };
+using AdjacencyMatrix = std::vector<std::vector<int>>;
 
 struct Data {
   std::map<std::string, Node*> nodes;
   std::map<int, Node*> nodes_by_id;
+  AdjacencyMatrix graph;
 
   ~Data() {
     for (auto node : nodes) {
@@ -27,99 +29,67 @@ struct Data {
   }
 };
 
-using AdjacencyMatrix = std::vector<std::vector<int>>;
-
-// int DFS(const Data& data, const AdjacencyMatrix& graph, std::vector<int>& visited, int n_cycles, int start) {
-//   int count = 0;
-//   // vertex, cycles, vertex with t in its name
-//   std::stack<std::tuple<int, int, bool>> stack;
-
-//   stack.push({start, n_cycles, data.nodes_by_id.at(start)->name_has_t});
-
-//   while(!stack.empty()) {
-//     auto& [node, cycles, has_t] = stack.top();
-//     visited[node] = 1;
-//     stack.pop();
-//     if (cycles == 0) {
-//       visited[node] = 0;
-//       if(graph[node][start] == graph[start][node] && has_t) {
-//         ++count;
-//       }
-//     }
-
-//     for(int i = 0; i < graph.size(); ++i) {
-//       if (graph[node][i] == 1 && visited[i] == 0) {
-//         stack.push({i, cycles - 1, has_t | data.nodes_by_id.at(i)->name_has_t});
-//       }
-//     }
-//   }
-
-//   return count;
-// }
-
-struct Args {
-  int start;
-  int vert;
-  int n;
-  bool has_t;
-};
-
-void DFS(const Data& data, const AdjacencyMatrix& graph, std::vector<int>& marked, int& count, Args args, int depth = 1) {
-  marked[args.vert] = 1;
-
-  if (args.n == 0) {
-    marked[args.vert] = 0;
-    if(graph[args.vert][args.start] == graph[args.start][args.vert] && args.has_t) {
-      ++count;
+AdjacencyMatrix cube(const AdjacencyMatrix& A) {
+  AdjacencyMatrix result = A;
+  for(int multiplications = 0; multiplications < 2; ++multiplications) {
+    AdjacencyMatrix temp(result.size(), std::vector<int>(result.size(), 0));
+    for(size_t i = 0; i < result.size(); ++i) {
+      for(size_t j = 0; j < result.size(); ++j) {
+        for(size_t k = 0; k < result.size(); ++k) {
+          temp[i][j] += result[i][k] * A[k][j];
+        }
+      }
     }
-    return;
+    result = temp;
   }
-
-  for(auto& neighbor : data.nodes_by_id.at(args.vert)->neighbors) {
-    if (marked[neighbor->id] == 0) {
-      std::string indent(2*depth, ' ');
-      std::cout << indent << neighbor->name << std::endl;
-      Args newargs = {
-        .start = args.start,
-        .vert = neighbor->id,
-        .n = args.n - 1,
-        .has_t = args.has_t || neighbor->name_has_t
-      };
-      DFS(data, graph, marked, count, newargs, depth + 1);
-    }
-  }
-  marked[args.vert] = 0;
+  return result;
 }
 
-int count_cycles(const Data& data, const AdjacencyMatrix& graph, int n_cycles) {
-  std::vector<int> visited(graph.size(), 0);
-  int count = 0;
-  for(const auto& [id, node] : data.nodes_by_id) {
-    bool d = node->name == "co";
-    std::cout << node->name << std::endl;
-    Args args = {
-      .vert = id,
-      .start = id,
-      .n = n_cycles - 1,
-      .has_t = node->name_has_t
-    };
-    DFS(data, graph, visited, count, args);
-    visited[id] = 1;
-    std::cout << std::endl;
+int triangles(const AdjacencyMatrix& A) {
+  int trace = 0;
+  for(int i = 0; i < A.size(); ++i) {
+    trace += A[i][i];
   }
-  return count / 2;
+  return trace / 6;
+}
+
+std::vector<std::tuple<int, int, int>> findTriangles(const AdjacencyMatrix& A, const AdjacencyMatrix& A3) {
+    std::vector<std::tuple<int, int, int>> triangles;
+    size_t n = A.size();
+
+    // Find triangles
+    for (size_t i = 0; i < n; ++i) {
+        for (size_t j = i + 1; j < n; ++j) {
+            if (A3[i][j] > 0 && A[i][j] == 1) {
+                for (size_t k = j + 1; k < n; ++k) {
+                    if (A[j][k] == 1 && A[k][i] == 1) { 
+                        triangles.emplace_back(i, j, k);
+                    }
+                }
+            }
+        }
+    }
+
+    return triangles;
 }
 
 int part1(const Data &data)
 {
-  AdjacencyMatrix graph(data.nodes.size(), std::vector<int>(data.nodes.size(), 0));
-  for(const auto& [id, node] : data.nodes_by_id) {
-    for(auto neighbor : node->neighbors) {
-      graph[id][neighbor->id] = 1;
-    }
+  int sum = 0;
+  auto cubed = cube(data.graph);
+  // std::cout << std::format("Triangles: {}\n", triangles(cubed));
+  // for(auto& i : cubed) {
+  //   for(auto j : i) {
+  //     std::cout << std::format("{:>3}", j);
+  //   }
+  //   std::cout << std::endl;
+  // }
+  auto triangles = findTriangles(data.graph, cubed);
+  for(auto& [i, j, k] : triangles) {
+    bool has_t = data.nodes_by_id.at(i)->name_has_t || data.nodes_by_id.at(j)->name_has_t || data.nodes_by_id.at(k)->name_has_t;
+    sum += has_t ? 1 : 0;
   }
-
-  return count_cycles(data, graph, 3);
+  return sum;
 }
 
 int part2(const Data &data)
@@ -147,7 +117,7 @@ Data parse()
       n1 = new Node();
       n1->name = parts[0];
       n1->id = id++;
-      n1->name_has_t = n1->name.find('t') != std::string::npos;
+      n1->name_has_t = n1->name[0] == 't';
       data.nodes[parts[0]] = n1;
       data.nodes_by_id[n1->id] = n1;
     } else {
@@ -157,7 +127,7 @@ Data parse()
       n2 = new Node();
       n2->name = parts[1];
       n2->id = id++;
-      n2->name_has_t = n2->name.find('t') != std::string::npos;
+      n2->name_has_t = n2->name[0] == 't';
       data.nodes[parts[1]] = n2;
       data.nodes_by_id[n2->id] = n2;
     } else {
@@ -166,6 +136,14 @@ Data parse()
     n1->neighbors.push_back(n2);
     n2->neighbors.push_back(n1);
   }
+
+  AdjacencyMatrix graph(data.nodes.size(), std::vector<int>(data.nodes.size(), 0));
+  for(const auto& [id, node] : data.nodes_by_id) {
+    for(auto neighbor : node->neighbors) {
+      graph[id][neighbor->id] = 1;
+    }
+  }
+  data.graph = graph;
 
   return data;
 }
