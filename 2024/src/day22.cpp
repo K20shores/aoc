@@ -10,17 +10,21 @@
 #include <set>
 
 // Specialization of std::hash for std::array<int, 4>
-namespace std {
-template <>
-struct hash<std::array<int, 4>> {
-  std::size_t operator()(const std::array<int, 4>& arr) const noexcept {
-    std::size_t h = 0;
-    for (int val : arr) {
-      h ^= std::hash<int>{}(val) + 0x9e3779b9 + (h << 6) + (h >> 2);
+namespace std
+{
+  template <>
+  struct hash<std::array<int, 4>>
+  {
+    std::size_t operator()(const std::array<int, 4> &arr) const noexcept
+    {
+      std::size_t h = 0;
+      for (int val : arr)
+      {
+        h ^= std::hash<int>{}(val) + 0x9e3779b9 + (h << 6) + (h >> 2);
+      }
+      return h;
     }
-    return h;
-  }
-};
+  };
 }
 
 struct Data
@@ -62,72 +66,48 @@ int64_t part1(const Data &data)
 }
 
 using Changes = std::unordered_map<std::array<int, 4>, int>;
-Changes generate_maximal_sequences(int64_t secret)
-{
-  Changes changes;
-  int price = secret % 10;
-  int64_t val = secret;
-  int change = 0;
-  std::array<int, 4> last_four_changes = {0, 0, 0, 0};
-
-  // std::cout << std::format("{:>9}: {}\n", secret, price);
-  for (int i = 0; i < 2000; ++i)
-  {
-    val = transform(val);
-    change = val % 10 - price;
-    price = val % 10;
-    last_four_changes[i % 4] = change;
-    if (i >= 3)
-    {
-      int d1 = last_four_changes[(i - 3 + 0) % 4];
-      int d2 = last_four_changes[(i - 3 + 1) % 4];
-      int d3 = last_four_changes[(i - 3 + 2) % 4];
-      int d4 = last_four_changes[(i - 3 + 3) % 4];
-      // if( d1 == -2 && d2 == 1 && d3 == -1 && d4 == 3) {
-      //     std::cout << std::format("{:>9}: {} ({})\n", val, price, change);
-      // }
-      if (changes.find({d1, d2, d3, d4}) == changes.end())
-      {
-        changes[{d1, d2, d3, d4}] = price;
-      }
-    }
-  }
-  //  std::cout << std::endl;
-
-  return changes;
-}
-
 int64_t part2(const Data &data)
 {
-  std::vector<Changes> sequences(data.values.size());
-  std::set<std::array<int, 4>> keys;
+  std::unordered_map<std::array<int, 4>, int64_t> global_sums;
+
   for (size_t i = 0; i < data.values.size(); ++i)
   {
-    sequences[i] = generate_maximal_sequences(data.values[i]);
-    for (const auto &[key, value] : sequences[i])
+    Changes sequences;
+    int price = data.values[i] % 10;
+    int64_t val = data.values[i];
+    int change = 0;
+    std::array<int, 4> last_four_changes = {0, 0, 0, 0};
+
+    for (int j = 0; j < 2000; ++j)
     {
-      keys.insert(key);
+      val = transform(val);
+      change = val % 10 - price;
+      price = val % 10;
+      last_four_changes[j % 4] = change;
+
+      if (j >= 3)
+      {
+        std::array<int, 4> key = {
+            last_four_changes[(j - 3 + 0) % 4],
+            last_four_changes[(j - 3 + 1) % 4],
+            last_four_changes[(j - 3 + 2) % 4],
+            last_four_changes[(j - 3 + 3) % 4]};
+
+        if (sequences.find(key) == sequences.end())
+        {
+          sequences[key] = price;
+          global_sums[key] += price;
+        }
+      }
     }
   }
 
   int64_t global_max = 0;
-  for(auto [i, j, k, l] : keys)
+  for (const auto &[key, sum] : global_sums)
   {
-    // std::cout << std::format("{}, {}, {}, {}\n", i, j, k, l);
-    int64_t sum = 0;
-    for (size_t idx = 0; idx < data.values.size(); ++idx)
-    {
-      if (sequences[idx].find({i, j, k, l}) != sequences[idx].end())
-      {
-        sum += sequences[idx][{i, j, k, l}];
-      }
-    }
-    if (sum > global_max)
-    {
-      // std::cout << std::format("{}, {}, {}, {} = {}\n", i, j, k, l, sum);
-      global_max = sum;
-    }
+    global_max = std::max(global_max, sum);
   }
+
   return global_max;
 }
 
