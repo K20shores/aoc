@@ -35,15 +35,15 @@ struct Operation {
 };
 
 struct Data {
-  std::map<std::string, int> gates;
+  std::map<std::string, int64_t> gates;
   std::vector<Operation> operations;
 };
 
-bool has_both_inputs(const Operation& op, const std::map<std::string, int>& gates) {
+bool has_both_inputs(const Operation& op, const std::map<std::string, int64_t>& gates) {
   return gates.at(op.arg1) != -1 && gates.at(op.arg2) != -1;
 }
 
-void put_valid_gates_first(std::vector<Operation>& operations, const std::map<std::string, int>& gates, size_t offset = 0) {
+void put_valid_gates_first(std::vector<Operation>& operations, const std::map<std::string, int64_t>& gates, size_t offset = 0) {
   std::sort(operations.begin() + offset, operations.end(), [&](const Operation& a, const Operation& b) {
     int valid_args_a = 0;
     valid_args_a += gates.at(a.arg1) != -1;
@@ -55,12 +55,11 @@ void put_valid_gates_first(std::vector<Operation>& operations, const std::map<st
   });
 }
 
-int64_t form_number(const std::map<std::string, int>& gates) {
-  int idx = 0;
+int64_t form_number(const std::map<std::string, int64_t>& gates) {
+  int64_t idx = 0;
   int64_t result = 0;
   for(auto& [gate, value] : gates) {
     if (gate[0] == 'z') {
-      std::cout << std::format("  {} {}\n", gate, value);
       result |= value << idx;
       ++idx;
     }
@@ -73,27 +72,13 @@ int64_t part1(const Data &data)
   auto operations = data.operations;
   auto gates = data.gates;
 
-  for(auto& [gate, value] : gates) {
-    std::cout << gate << " " << value << std::endl;
-  }
-
-  for(auto& op : operations) {
-    std::cout << std::format("{} {} {} -> {}\n", op.arg1, gate_to_string(op.gate), op.arg2, op.target);
-  }
-  std::cout << std::endl;
-
   put_valid_gates_first(operations, gates);
-
-  for(auto& op : operations) {
-    std::cout << std::format("{} {} {} -> {}\n", op.arg1, gate_to_string(op.gate), op.arg2, op.target);
-  }
-  std::cout << std::endl;
 
   for(size_t i = 0; i < operations.size(); ++i) {
     auto& op = operations[i];
     if (has_both_inputs(op, gates)) {
-      int arg1 = data.gates.at(op.arg1);
-      int arg2 = data.gates.at(op.arg2);
+      int arg1 = gates.at(op.arg1);
+      int arg2 = gates.at(op.arg2);
       int result = 0;
       switch(op.gate) {
         case Gate::AND:
@@ -112,13 +97,9 @@ int64_t part1(const Data &data)
     }
     else {
       put_valid_gates_first(operations, gates, i);
-      // --i;
+      --i;
     }
   }
-  for(auto& [gate, value] : gates) {
-    std::cout << gate << " " << value << std::endl;
-  }
-  std::cout << std::endl;
   return form_number(gates);
 }
 
@@ -224,7 +205,7 @@ int main(int argc, char **argv)
 {
   Data data = parse();
 
-  int64_t answer1 = 0;
+  int64_t answer1 = 45923082839246;
   int64_t answer2 = 0;
 
   auto first = part1(data);
