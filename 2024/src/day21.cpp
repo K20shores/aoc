@@ -18,185 +18,150 @@ std::vector<std::string> numeric_keypad = {
   "123",
   " 0A"
 };
+Pos _9 = {.x = 2, .y = 0};
+Pos _8 = {.x = 1, .y = 0};
+Pos _7 = {.x = 0, .y = 0};
+Pos _6 = {.x = 2, .y = 1};
+Pos _5 = {.x = 1, .y = 1};
+Pos _4 = {.x = 0, .y = 1};
+Pos _3 = {.x = 2, .y = 2};
+Pos _2 = {.x = 1, .y = 2};
+Pos _1 = {.x = 0, .y = 2};
+Pos _0 = {.x = 1, .y = 3};
+Pos _numA = {.x = 2, .y = 3};
 std::map<char, Pos> numeric_keyapd_char_to_pos = {
-  {'7', Pos{.x = 0, .y = 0}}, {'8', Pos{.x = 1, .y = 0}}, {'9', Pos{.x = 2, .y = 0}},
-  {'4', Pos{.x = 0, .y = 1}}, {'5', Pos{.x = 1, .y = 1}}, {'6', Pos{.x = 2, .y = 1}},
-  {'1', Pos{.x = 0, .y = 2}}, {'2', Pos{.x = 1, .y = 2}}, {'3', Pos{.x = 2, .y = 2}},
-                              {'0', Pos{.x = 1, .y = 3}}, {'A', Pos{.x = 2, .y = 3}}
+  {'7', _7}, {'8', _8}, {'9', _9},
+  {'4', _4}, {'5', _5}, {'6', _6},
+  {'1', _1}, {'2', _2}, {'3', _3},
+  {'0', _0}, {'A', _numA}
+};
+std::map<std::pair<Pos, Pos>, std::string> numeric_shortest_paths = {
+  {{_7, _9}, ">>"}, {{_7, _8}, ">"}, {{_7, _6}, "v>>"},
+  {{_7, _5}, "v>"}, {{_7, _4}, "v"}, {{_7, _3}, "vv>>"},
+  {{_7, _2}, "vv>"}, {{_7, _1}, "vv"}, {{_7, _0}, ">vvv"},
+  {{_7, _numA}, ">>vvv"},
+
+  {{_8, _9}, ">"}, {{_8, _7}, "<"}, {{_8, _6}, "v>"},
+  {{_8, _5}, "v"}, {{_8, _4}, "<v"}, {{_8, _3}, "vv>"},
+  {{_8, _2}, "vv"}, {{_8, _1}, "<vv"}, {{_8, _0}, "vvv"},
+  {{_8, _numA}, "vvv>"},
+
+  {{_9, _8}, "<"}, {{_9, _7}, "<<"}, {{_9, _6}, "v"},
+  {{_9, _5}, "v<"}, {{_9, _4}, "<<v"}, {{_9, _3}, "vv"},
+  {{_9, _2}, "<vv"}, {{_9, _1}, "<<vv"}, {{_9, _0}, "<vvv"},
+  {{_9, _numA}, "vvv"},
+
+  {{_4, _9}, "^>>"}, {{_4, _8}, "^>"}, {{_4, _7}, "^"},
+  {{_4, _6}, ">>"}, {{_4, _5}, ">"}, {{_4, _3}, "v>>"},
+  {{_4, _2}, "v>"}, {{_4, _1}, "v"}, {{_4, _0}, ">vv"},
+  {{_4, _numA}, ">>vv"},
+
+  {{_5, _9}, "^>"}, {{_5, _8}, "^"}, {{_5, _7}, "<^"},
+  {{_5, _6}, ">"}, {{_5, _4}, "<"}, {{_5, _3}, "v>"},
+  {{_5, _2}, "v"}, {{_5, _1}, "<v"}, {{_5, _0}, "vv"},
+  {{_5, _numA}, "vv>"},
+
+  {{_6, _9}, "^"}, {{_6, _8}, "^<"}, {{_6, _7}, "<<^"},
+  {{_6, _5}, "<"}, {{_6, _4}, "<<"}, {{_6, _3}, "v"},
+  {{_6, _2}, "<v"}, {{_6, _1}, "<<v"}, {{_6, _0}, "<vv"},
+  {{_6, _numA}, "vv"},
+
+  {{_1, _9}, "^^>>"}, {{_1, _8}, "^^>"}, {{_1, _7}, "^^"},
+  {{_1, _6}, "^>>"}, {{_1, _5}, "^>"}, {{_1, _4}, "^"},
+  {{_1, _3}, ">>"}, {{_1, _2}, ">"}, {{_1, _0}, ">v"},
+  {{_1, _numA}, ">>v"},
+
+  {{_2, _9}, "^^>"}, {{_2, _8}, "^^"}, {{_2, _7}, "<^^"},
+  {{_2, _6}, "^>"}, {{_2, _5}, "^"}, {{_2, _4}, "<^"},
+  {{_2, _3}, ">"}, {{_2, _1}, "<"}, {{_2, _0}, "v"},
+  {{_2, _numA}, "v>"},
+
+  {{_3, _9}, "^^"}, {{_3, _8}, "<^^"}, {{_3, _7}, "<<^^"},
+  {{_3, _6}, "^"}, {{_3, _5}, "<^"}, {{_3, _4}, "<<^"},
+  {{_3, _2}, "<"}, {{_3, _1}, "<<"}, {{_3, _0}, "<v"},
+  {{_3, _numA}, "v"},
+
+  {{_0, _9}, "^^^>"}, {{_0, _8}, "^^^"}, {{_0, _7}, "^^^<"},
+  {{_0, _6}, "^^>"}, {{_0, _5}, "^^"}, {{_0, _4}, "^^<"},
+  {{_0, _3}, "^>"}, {{_0, _2}, "^"}, {{_0, _1}, "^<"},
+  {{_0, _numA}, ">"},
+
+  {{_numA, _9}, "^^^"}, {{_numA, _8}, "<^^^"}, {{_numA, _7}, "^^^<<"},
+  {{_numA, _6}, "^^"}, {{_numA, _5}, "<^^"}, {{_numA, _4}, "^^<<"},
+  {{_numA, _3}, "^"}, {{_numA, _2}, "<^"}, {{_numA, _1}, "^<<<"},
+  {{_numA, _0}, "<"}
 };
 
+Pos _up = {.x = 1, .y = 0};
+Pos _dirA = {.x = 2, .y = 0};
+Pos _left = {.x = 0, .y = 1};
+Pos _down = {.x = 1, .y = 1};
+Pos _right = {.x = 2, .y = 1};
 std::vector<std::string> directional_keypad = {
   " ^A",
   "<v>"
 };
 std::map<char, Pos> directional_keyapd_char_to_pos = {
-  {'^', Pos{.x = 1, .y = 0}}, {'A', Pos{.x = 2, .y = 0}},
-  {'<', Pos{.x = 0, .y = 1}}, {'v', Pos{.x = 1, .y = 1}}, {'>', Pos{.x = 2, .y = 1}}
+  {'^', _up}, {'A', _dirA},
+  {'<', _left}, {'v', _down}, {'>', _right}
+};
+std::map<std::pair<Pos, Pos>, std::string> directional_shortest_paths = {
+  {{_up, _dirA}, ">"}, {{_up, _right}, "v>"}, {{_up, _down}, "v"},
+  {{_up, _left}, "v<"},
+
+  {{_dirA, _up}, "<"}, {{_dirA, _right}, "v"}, {{_dirA, _down}, "<v"},
+  {{_dirA, _left}, "v<<"},
+
+  {{_left, _dirA}, ">>^"}, {{_left, _up}, ">^"}, {{_left, _right}, ">>"},
+  {{_left, _down}, ">"},
+
+  {{_down, _dirA}, "^>"}, {{_down, _right}, ">"}, {{_down, _up}, "^"},
+  {{_down, _left}, "<"},
+
+  {{_right, _dirA}, "^"}, {{_right, _up}, "<^"}, {{_right, _down}, "<"},
+  {{_right, _left}, "<<"}
 };
 
-bool in_bounds(int64_t x, int64_t y, const std::vector<std::string> &keypad)
-{
-  return x >= 0 && x < keypad[0].size() && y >= 0 && y < keypad.size();
-}
-
-using Vertices = std::vector<Pos>;
-using Edges = std::map<Pos, std::vector<Pos>>;
-
-std::pair<Vertices, Edges> build_graph(const std::vector<std::string> &keypad)
-{
-  std::vector<Pos> vertices;
-  std::map<Pos, std::vector<Pos>> edges;
-
-  for (int64_t j = 0; j < keypad.size(); ++j)
-  {
-    for (int64_t i = 0; i < keypad[j].size(); ++i)
-    {
-      if (keypad[j][i] != ' ')
-      {
-        vertices.push_back(Pos{.x = i, .y = j});
-      }
-    }
-  }
-
-  for (const auto &v : vertices)
-  {
-    for (const auto &dir : directions)
-    {
-      Pos next = v + dir;
-      if (in_bounds(next.x, next.y, keypad) && keypad[next.y][next.x] != ' ')
-      {
-        edges[v].push_back(next);
-      }
-    }
-  }
-  return {vertices, edges};
-}
-
-// after writing ths, I realized that I could have just computed the manhattan distance 
-// between each pair of vertices and stored that in a map
-using Distances = std::map<Pos, std::map<Pos, int>>;
-using Paths = std::map<Pos, std::map<Pos, Pos>>;
-using DirectionChanges = Distances;
-
-std::pair<Distances, Paths> floyd_warshall(const std::pair<Vertices, Edges>& graph)
-{
-  const auto& [vertices, edges] = graph;
-  Distances dist;
-  Paths prev;
-  DirectionChanges direction_changes;
-
-  for (const auto &u : vertices)
-  {
-    for (const auto &v : vertices)
-    {
-      dist[u][v] = INT_MAX;
-      prev[u][v] = Pos{.x = -1, .y = -1};
-      direction_changes[u][v] = 0;
-    }
-  }
-
-  for (const auto &u : vertices)
-  {
-    for (const auto &v : edges.at(u))
-    {
-      dist[u][v] = 1;
-      prev[u][v] = u;
-      direction_changes[u][v] = 0;
-    }
-    dist[u][u] = 0;
-    prev[u][u] = u;
-    direction_changes[u][u] = 0;
-  }
-
-  for (const auto &k : vertices)
-  {
-    for (const auto &i : vertices)
-    {
-      for (const auto &j : vertices)
-      {
-        auto &dik = dist[i][k];
-        auto &dkj = dist[k][j];
-        auto &dij = dist[i][j];
-
-        auto &dik_dir = direction_changes[i][k];
-        auto &dkj_dir = direction_changes[k][j];
-        auto &dij_dir = direction_changes[i][j];
-        if (dik != INT_MAX && dkj != INT_MAX && dij > dik + dkj)
-        {
-          dij = dik + dkj;
-          prev[i][j] = prev[k][j];
-        }
-      }
-    }
-  }
-
-  return {dist, prev};
-}
-
-std::vector<Pos> shortest_path(const Pos &start, const Pos &end, const Paths &paths)
-{
-  std::vector<Pos> path;
-  Pos current = end;
-  while (current != start)
-  {
-    path.push_back(current);
-    current = paths.at(start).at(current);
-  }
-  path.push_back(start);
-  std::reverse(path.begin(), path.end());
-  return path;
-}
-
-std::string get_path(std::string path, const Paths& shortest_paths, const Distances& distances, std::vector<std::string> keypad, std::map<char, Pos> char_to_pos) {
+std::string get_path(std::string path, std::map<char, Pos> char_to_pos, std::map<std::pair<Pos, Pos>, std::string> shortest_path, std::vector<std::string> keypad) {
   Pos start = char_to_pos['A'];
-  std::string numeric_path;
+  std::string output_path = "";
   Pos current = start;
   for (char c : path) {
     Pos next = char_to_pos[c];
-    auto path = shortest_path(current, next, shortest_paths);
-    for(size_t i = 0; i < path.size() - 1; ++i) {
-      Pos dir = path[i + 1] - path[i];
-      if (dir == up) {
-        numeric_path += '^';
-      } else if (dir == right) {
-        numeric_path += '>';
-      } else if (dir == down) {
-        numeric_path += 'v';
-      } else {
-        numeric_path += '<';
-      }
-    }
-    numeric_path.push_back('A');
+    output_path += shortest_path[{current, next}];
+    output_path.push_back('A');
+    std::cout << std::format("-- moving from ({}) to ({}) :: {}", keypad[current.y][current.x], keypad[next.y][next.x], output_path) << std::endl;
     current = next;
   }
-  return numeric_path;
+  return output_path;
 }
 
 int part1(const Data &data)
 {
-  auto [numeric_distances, numeric_paths] = floyd_warshall(build_graph(numeric_keypad));
-  auto [directional_distances, directional_paths] = floyd_warshall(build_graph(directional_keypad));
   int n_robots = 2;
-
+  int sum = 0;
   for(const auto& code : data.codes) {
+    int val = std::stoi(code.substr(0, code.size() - 1));
+    std::cout << std::format("{} ({})\n", code, val);
     std::cout << code << std::endl;
-    auto numeric_path = get_path(code, numeric_paths, numeric_distances, numeric_keypad, numeric_keyapd_char_to_pos);
+    auto numeric_path = get_path(code, numeric_keyapd_char_to_pos, numeric_shortest_paths, numeric_keypad);
     for(auto c : numeric_path) {
       std::cout << c;
     }
     std::cout << " " << numeric_path.size() << std::endl;
     std::string directional_path = numeric_path;
     for(int i = 0; i < n_robots; ++i) {
-      directional_path = get_path(directional_path, directional_paths, directional_distances, directional_keypad, directional_keyapd_char_to_pos);
+      directional_path = get_path(directional_path, directional_keyapd_char_to_pos, directional_shortest_paths, directional_keypad);
       for(auto c : directional_path) {
         std::cout << c;
       }
       std::cout << " " << directional_path.size() << std::endl;
     }
+    sum += val * directional_path.size();
     std::cout << std::endl;
   }
 
-  return 0;
+  return sum;
 }
 
 int part2(const Data &data)
