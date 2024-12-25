@@ -88,7 +88,7 @@ std::map<std::pair<Pos, Pos>, std::string> numeric_shortest_paths = {
 
   {{_numA, _9}, "^^^"}, {{_numA, _8}, "<^^^"}, {{_numA, _7}, "^^^<<"},
   {{_numA, _6}, "^^"}, {{_numA, _5}, "<^^"}, {{_numA, _4}, "^^<<"},
-  {{_numA, _3}, "^"}, {{_numA, _2}, "<^"}, {{_numA, _1}, "^<<<"},
+  {{_numA, _3}, "^"}, {{_numA, _2}, "<^"}, {{_numA, _1}, "^<<"},
   {{_numA, _0}, "<"}
 };
 
@@ -123,14 +123,13 @@ std::map<std::pair<Pos, Pos>, std::string> directional_shortest_paths = {
 };
 
 std::string get_path(std::string path, std::map<char, Pos> char_to_pos, std::map<std::pair<Pos, Pos>, std::string> shortest_path, std::vector<std::string> keypad) {
-  Pos start = char_to_pos['A'];
   std::string output_path = "";
-  Pos current = start;
+  Pos current = char_to_pos['A'];
   for (char c : path) {
     Pos next = char_to_pos[c];
     output_path += shortest_path[{current, next}];
     output_path.push_back('A');
-    std::cout << std::format("-- moving from ({}) to ({}) :: {}", keypad[current.y][current.x], keypad[next.y][next.x], output_path) << std::endl;
+    // std::cout << std::format("-- moving from ({}) to ({}) :: {}", keypad[current.y][current.x], keypad[next.y][next.x], output_path) << std::endl;
     current = next;
   }
   return output_path;
