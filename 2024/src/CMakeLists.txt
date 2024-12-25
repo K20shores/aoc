@@ -35,6 +35,7 @@ create_standard_test(NAME 2024_day21 SOURCES day21.cpp LIBRARIES aoc2024)
 create_standard_test(NAME 2024_day22 SOURCES day22.cpp LIBRARIES aoc2024)
 create_standard_test(NAME 2024_day23 SOURCES day23.cpp LIBRARIES aoc2024)
 create_standard_test(NAME 2024_day24 SOURCES day24.cpp LIBRARIES aoc2024)
+create_standard_test(NAME 2024_day25 SOURCES day25.cpp LIBRARIES aoc2024)
 
 ################################################################################
 # Copy input data
