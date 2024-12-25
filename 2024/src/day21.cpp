@@ -61,7 +61,7 @@ std::map<std::pair<Pos, Pos>, std::string> numeric_shortest_paths = {
   {{_5, _2}, "v"}, {{_5, _1}, "<v"}, {{_5, _0}, "vv"},
   {{_5, _numA}, "vv>"},
 
-  {{_6, _9}, "^"}, {{_6, _8}, "^<"}, {{_6, _7}, "<<^"},
+  {{_6, _9}, "^"}, {{_6, _8}, "<^"}, {{_6, _7}, "<<^"},
   {{_6, _5}, "<"}, {{_6, _4}, "<<"}, {{_6, _3}, "v"},
   {{_6, _2}, "<v"}, {{_6, _1}, "<<v"}, {{_6, _0}, "<vv"},
   {{_6, _numA}, "vv"},
@@ -129,7 +129,6 @@ std::string get_path(std::string path, std::map<char, Pos> char_to_pos, std::map
     Pos next = char_to_pos[c];
     output_path += shortest_path[{current, next}];
     output_path.push_back('A');
-    // std::cout << std::format("-- moving from ({}) to ({}) :: {}", keypad[current.y][current.x], keypad[next.y][next.x], output_path) << std::endl;
     current = next;
   }
   return output_path;
@@ -141,23 +140,13 @@ int part1(const Data &data)
   int sum = 0;
   for(const auto& code : data.codes) {
     int val = std::stoi(code.substr(0, code.size() - 1));
-    std::cout << std::format("{} ({})\n", code, val);
-    std::cout << code << std::endl;
     auto numeric_path = get_path(code, numeric_keyapd_char_to_pos, numeric_shortest_paths, numeric_keypad);
-    for(auto c : numeric_path) {
-      std::cout << c;
-    }
-    std::cout << " " << numeric_path.size() << std::endl;
     std::string directional_path = numeric_path;
     for(int i = 0; i < n_robots; ++i) {
       directional_path = get_path(directional_path, directional_keyapd_char_to_pos, directional_shortest_paths, directional_keypad);
-      for(auto c : directional_path) {
-        std::cout << c;
-      }
-      std::cout << " " << directional_path.size() << std::endl;
     }
+    std::cout << std::format("{}: {} ({} * {})\n", code, directional_path, directional_path.size(), val);
     sum += val * directional_path.size();
-    std::cout << std::endl;
   }
 
   return sum;
@@ -221,7 +210,7 @@ int main(int argc, char **argv)
 {
   Data data = parse();
 
-  int answer1 = 0;
+  int answer1 = 176452;
   int answer2 = 0;
 
   auto first = part1(data);
