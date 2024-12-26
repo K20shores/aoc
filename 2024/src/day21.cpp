@@ -134,27 +134,29 @@ std::string get_path(std::string path, std::map<char, Pos> char_to_pos, std::map
   return output_path;
 }
 
-int part1(const Data &data)
-{
-  int n_robots = 2;
-  int sum = 0;
+int64_t press_keys(const Data& data, int n_robots) {
+  int64_t sum = 0;
   for(const auto& code : data.codes) {
-    int val = std::stoi(code.substr(0, code.size() - 1));
+    int64_t val = std::stoi(code.substr(0, code.size() - 1));
     auto numeric_path = get_path(code, numeric_keyapd_char_to_pos, numeric_shortest_paths, numeric_keypad);
     std::string directional_path = numeric_path;
     for(int i = 0; i < n_robots; ++i) {
       directional_path = get_path(directional_path, directional_keyapd_char_to_pos, directional_shortest_paths, directional_keypad);
     }
-    std::cout << std::format("{}: {} ({} * {})\n", code, directional_path, directional_path.size(), val);
     sum += val * directional_path.size();
   }
 
   return sum;
 }
 
-int part2(const Data &data)
+int64_t part1(const Data &data)
 {
-  return 0;
+  return press_keys(data, 2);
+}
+
+int64_t part2(const Data &data)
+{
+  return press_keys(data, 25);
 }
 
 Data parse()
@@ -210,8 +212,8 @@ int main(int argc, char **argv)
 {
   Data data = parse();
 
-  int answer1 = 176452;
-  int answer2 = 0;
+  int64_t answer1 = 176452;
+  int64_t answer2 = 0;
 
   auto first = part1(data);
   std::cout << "Part 1: " << first << std::endl;
